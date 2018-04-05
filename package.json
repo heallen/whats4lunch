@@ -19,6 +19,6 @@
   "homepage": "https://github.com/heallen/whats4lunch#readme",
   "dependencies": {
     "express": "^4.16.3",
-    "oracle": "^0.4.1"
+    "oracledb": "^2.2.0"
   }
 }
