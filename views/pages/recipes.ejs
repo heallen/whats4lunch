@@ -12,7 +12,27 @@
         <h2>Recipes</h2>
         <ul class="recipesList list-group list-group-flush">
           <% recipes.forEach(function(recipe) { %>
-            <li class="list-group-item"><%= recipe %></li>
+            <li class="list-group-item">
+              
+              <span class="row-item">
+                <a href=#><%= recipe.name %></a>
+              </span>
+
+              <span class="row-item">
+                <% if (recipe.tags.indexOf("healthy") != -1) { %>
+                  <span class="badge badge-pill badge-success">Healthy</span>
+                <% } %>
+
+                <% if (recipe.tags.indexOf("low fat") != -1) { %>
+                  <span class="badge badge-pill badge-warning">Low Fat</span>
+                <% } %>
+              </span>
+
+              <span class="row-item">
+               Rating: <%= recipe.rating %>
+              </span>
+
+            </li>
           <% }) %>
         </ul>
       </div>

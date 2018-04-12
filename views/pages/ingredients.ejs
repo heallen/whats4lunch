@@ -1,0 +1,22 @@
+<head>
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" type="text/css" href="styles/recipes.css">
+</head>
+
+<body>
+    <%- include('../partials/navbar') %>
+
+    <div class="pageContent">
+
+      <div class="recipesContainer">
+        <h2>Ingredients</h2>
+        <ul class="recipesList list-group list-group-flush">
+          <% ingredients.forEach(function(ingredient) { %>
+            <li class="list-group-item"><%= ingredient %></li>
+          <% }) %>
+        </ul>
+      </div>
+
+
+    </div>
+</body>

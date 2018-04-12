@@ -21,19 +21,41 @@ function init(){
 
         // add all routes here, pass pool into those that need it
         app.listen(3000, () => console.log('Example app listening on port 3000!'))
-        app.get('/', (req, res) => recipesPage(req, res, pool))
+        app.get('/', (req, res) => mainPage(req, res, pool))
+        app.get('/recipes', (req, res) => recipesPage(req, res, pool))
+        app.get('/ingredients', (req, res) => ingredientsPage(req, res, pool))
       }
     )
 }
 
 function mainPage(req, res, pool) {
-    getConnection(pool, createTables)
+    // getConnection(pool, createTables)
     res.render('pages/main');
 }
 
 function recipesPage(req, res, pool) {
-    var recipeNames = ["Halal", "Chinese Food Truck", "Wawa"]
-    res.render('pages/recipes', {recipes: recipeNames});
+    var recipes = [
+      {
+        name: "Halal",
+        rating: 4,
+        tags: [
+          "healthy",
+          "low fat"
+        ]
+      },
+      {
+        name: "Wawa",
+        rating: 5,
+        tags: [
+        ]
+      }
+    ]
+    res.render('pages/recipes', {recipes: recipes});
+}
+
+function ingredientsPage(req, res, pool) {
+    var ingredientsNames = ["Chicken", "Spinach", "Bread", "Peanut Butter"]
+    res.render('pages/ingredients', {ingredients: ingredientsNames});
 }
 
 //call this function with the function callback(connection), and do whatever with that connection
