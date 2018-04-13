@@ -72,6 +72,22 @@ function jsonifyNutrition(){
     console.log('done')
 }
 
+
+function cleanItem(item){
+
+    //remove anything surrounded with parentheses e.g. (optional)
+
+    //remove all punctuation (e.g. ,.;*/)
+
+    //remove all conjunctions (e.g. and, or, into, etc)
+}
+
+
+//match cleaned item to item from nutrition.json based on how many words overlap
+function matchItem(item){
+
+}
+
 function normalizeRecipeIngredients(){
     // Loads JSON object
     var recipes = require('../data/recipes.json')
@@ -80,21 +96,17 @@ function normalizeRecipeIngredients(){
     for(recipe of recipes){
         if(recipe["ingredients"]){
             for(ingredient of recipe["ingredients"]){
+                console.log(ingredient); // step 1
                 var result = ingredient.match(/((?:\d+ )?\d+(?:\/\d+)?)\ (cups?|teaspoons?|tablespoons?|pounds?|ounces? )?(.*)/i)
                 
                 if(result){
-                    if(result[1]){
-                        console.log('Amount: ' + result[1])
-                    } 
-                    if(result[2]){
-                        console.log('Unit: ' + result[2])
-                    }
-                    if(result[3]){
-                        console.log('Item: ' + result[3])
-                    }
+                    var ingredientObj = {amount: result[1], unit: result[2], item: result[3]}
+                    console.log(ingredientObj) // step 2
+                    // var cleanedItem = cleanItem(result[3]); //step 3
+                    // var matchedItem = matchItem(cleanedItem); //step 4
+                    // ingredientObj.item = matchedItem;
+                    console.log('\n')
                 }
-    
-                console.log(ingredient + '\n')
             }
         }
     }
