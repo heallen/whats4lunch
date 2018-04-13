@@ -1,8 +1,6 @@
 var fs = require('fs');
 const excelToJson = require('convert-excel-to-json');
  
-
- 
 // Just to make a JSON file that isn't one long line and easier to look at manually
 function prettifyRecipes(){
     var raw_recipes = require('../data/recipes_raw.json')
@@ -74,7 +72,36 @@ function jsonifyNutrition(){
     console.log('done')
 }
 
-jsonifyNutrition()
+function normalizeRecipeIngredients(){
+    // Loads JSON object
+    var recipes = require('../data/recipes.json')
+    var nutrition = require('../data/nutrition.json')
 
-// Loads JSON object
-// var recipes = require('../data/recipes.json')
+    for(recipe of recipes){
+        if(recipe["ingredients"]){
+            for(ingredient of recipe["ingredients"]){
+                var result = ingredient.match(/((?:\d+ )?\d+(?:\/\d+)?)\ (cups?|teaspoons?|tablespoons?|pounds?|ounces? )?(.*)/i)
+                
+                if(result){
+                    if(result[1]){
+                        console.log('Amount: ' + result[1])
+                    } 
+                    if(result[2]){
+                        console.log('Unit: ' + result[2])
+                    }
+                    if(result[3]){
+                        console.log('Item: ' + result[3])
+                    }
+                }
+    
+                console.log(ingredient + '\n')
+            }
+        }
+    }
+}
+
+normalizeRecipeIngredients()
+
+
+
+
