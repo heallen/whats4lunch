@@ -22,6 +22,7 @@ function init(){
         // add all routes here, pass pool into those that need it
         app.listen(3000, () => console.log('Example app listening on port 3000!'))
         app.get('/', (req, res) => mainPage(req, res, pool))
+        app.get('/recipes/:recipeID', (req, res) => recipePage(req, res, pool))
         app.get('/recipes', (req, res) => recipesPage(req, res, pool))
         app.get('/ingredients', (req, res) => ingredientsPage(req, res, pool))
       }
@@ -36,6 +37,7 @@ function mainPage(req, res, pool) {
 function recipesPage(req, res, pool) {
     var recipes = [
       {
+        id: "Halal",
         name: "Halal",
         rating: 4,
         tags: [
@@ -44,6 +46,7 @@ function recipesPage(req, res, pool) {
         ]
       },
       {
+        id: "Wawa",
         name: "Wawa",
         rating: 5,
         tags: [
@@ -51,6 +54,34 @@ function recipesPage(req, res, pool) {
       }
     ]
     res.render('pages/recipes', {recipes: recipes});
+}
+
+function recipePage(req, res, pool) {
+
+  var recipeID = req.params.recipeID;
+
+  //make a call to get recipe information based on name/id
+  var recipe = {
+    recipeID: recipeID,
+    name: "Halal",
+    rating: 4,
+    tags: [
+      "healthy",
+      "low fat"
+    ],
+    directions: [
+      "1. Place the stock, lentils, celery, carrot, thyme, and salt in a medium saucepan and bring to a boil. Reduce heat to low and simmer until the lentils are tender, about 30 minutes, depending on the lentils. (If they begin to dry out, add water as needed.) Remove and discard the thyme. Drain and transfer the mixture to a bowl; let cool.",
+      "2. Fold in the tomato, apple, lemon juice, and olive oil. Season with the pepper.",
+      "3. To assemble a wrap, place 1 lavash sheet on a clean work surface. Spread some of the lentil mixture on the end nearest you, leaving a 1-inch border. Top with several slices of turkey, then some of the lettuce. Roll up the lavash, slice crosswise, and serve. If using tortillas, spread the lentils in the center, top with the turkey and lettuce, and fold up the bottom, left side, and right side before rolling away from you."
+    ],
+    ingredients: [
+      {amount: 4, unit: "cups", item: "low-sodium vegetable or chicken stock"},
+      {amount: 1, unit: "cup", item: "dried brown lentils"},
+      {amount: 1/2, unit: "cup", item: "dried French green lentils"},
+    ],
+  };
+
+  res.render('pages/recipe', {recipe: recipe});
 }
 
 function ingredientsPage(req, res, pool) {
