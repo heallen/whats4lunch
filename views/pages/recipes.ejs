@@ -1,6 +1,6 @@
 <head>
     <%- include('../partials/head') %>
-    <link rel="stylesheet" type="text/css" href="styles/recipes.css">
+    <link rel="stylesheet" type="text/css" href="/styles/recipes.css">
 </head>
 
 <body>
@@ -15,7 +15,7 @@
             <li class="list-group-item">
               
               <span class="row-item">
-                <a href=#><%= recipe.name %></a>
+                <a href=<%= "recipes/" + recipe.name %>><%= recipe.name %></a>
               </span>
 
               <span class="row-item">
