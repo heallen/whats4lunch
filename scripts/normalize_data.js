@@ -1,6 +1,5 @@
 let fs = require('fs');
-const excelToJson = require('convert-excel-to-json');
- 
+
 // Just to make a JSON file that isn't one long line and easier to look at manually
 function prettifyRecipes(){
     let raw_recipes = require('../data/recipes_raw.json')
@@ -14,6 +13,7 @@ function jsonifyNutrition(){
     // let worksheet = workbook.Sheets['ABBREV']
     // let nutritionJSON = XLSX.utils.sheet_to_json(workbook)
     // console.log(nutritionJSON)
+    const excelToJson = require('convert-excel-to-json');
     const result = excelToJson({
         sourceFile: '../data/nutrition_raw.xlsx',
         header: {
@@ -72,7 +72,11 @@ function jsonifyNutrition(){
     console.log('done')
 }
 
-
+/**
+ * cleanItem Cleans up the ingredient name string
+ * @param {string} item The name of an individual ingredient for a recipe
+ * @returns {string} The ingredient, with its string cleaned up
+ */
 function cleanItem(item) {
     item = item.toLowerCase();
 
@@ -93,8 +97,6 @@ function cleanItem(item) {
 
     // if single word
     if (item.indexOf(' ') < 0) {
-        // console.log(item);
-        // console.log('borg');
         // lemmer.lemmatize(item, (err, words) => {
         //     console.log(words);
         //     console.log('bongo');
@@ -161,15 +163,25 @@ function matchItem(item, nutrition) {
         num_good++;
     }
     // console.log(best_5);
+    return best_5[0][0];
 }
 
-function normalizeRecipeIngredients(){
+/**
+ * Loads in the recipes .json file and saves a new file
+ * (recipes_normalized.json) in which every recipe object now has a new field
+ * called "ingredients_normalized" which contains a list of ingredient objects.
+ * Each ingredient object consists of the fields "amount", "unit", and "item".
+ * However, some of these fields may be missing (if undefined).
+ */
+function normalizeRecipes(){
     // Loads JSON object
     let recipes = require('../data/recipes.json');
     let nutrition = require('../data/nutrition.json');
 
+    let recipes_normalized = []
     for (let recipe of recipes) {
         if (recipe['ingredients']){
+            ingredients_normalized = [];
             for (let ingredient of recipe['ingredients']) {
                 // console.log('Step 1');
                 let result = ingredient.match(/((?:\d+ )?\d+(?:\/\d+)?)\ (cups?|teaspoons?|tablespoons?|pounds?|ounces? )?(.*)/i)
@@ -183,17 +195,24 @@ function normalizeRecipeIngredients(){
                     // console.log(cleanedItem);
                     let matchedItem = matchItem(cleanedItem, nutrition);
                     // console.log('Step 4');
-                    ingredientObj.item = matchedItem;
+                    ingredientObj['item'] = matchedItem;
                     // console.log('\n')
+                    ingredients_normalized.push(ingredientObj);
                 }
             }
+            recipe_normalized = recipe;
+            recipe_normalized['ingredients_normalized'] = ingredients_normalized;
+            recipes_normalized.push(recipe_normalized);
         }
     }
     console.log('num good: ' + num_good);
     console.log('num_bad: ' + num_bad);
+    let recipes_normalized_json = JSON.stringify(recipes_normalized, null, 2);
+    fs.writeFile('../data/recipes_normalized.json', recipes_normalized_json, 'utf8')
+    console.log('done')
 }
 
-normalizeRecipeIngredients()
+normalizeRecipes()
 
 
 
