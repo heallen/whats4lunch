@@ -113,12 +113,12 @@ function cleanItem(item) {
 
 let num_bad = 0;
 let num_good = 0;
-// match cleaned item to item from nutrition.json based on how many words overlap
 let stringSimilarity = require('string-similarity');
-let lemmer = require('lemmer');
+// let lemmer = require('lemmer');
 function matchItem(item, nutrition) {
     // first, compute similarity based on primary name
-    let scores = [];    // stores [index, score] pairs
+    let bestIndices = [];
+    let bestScore = 0;
     for (let i = 0; i < nutrition.length; i++) {
         let name = nutrition[i]['name'];
         let primaryName = name;
@@ -126,20 +126,17 @@ function matchItem(item, nutrition) {
             primaryName = name.substring(0, name.indexOf(','));
         }
         let similarity = stringSimilarity.compareTwoStrings(item, primaryName);
-        scores.push([i, similarity]);
-    }
-    scores.sort((a, b) => b[1] - a[1]);     // sort descending
-    let bestScore = scores[0][1];
-    let bestIndices = [];
-    for (pair of scores) {
-        if (Math.abs(bestScore - pair[1]) > 0.001) {
-            break;
+        if (Math.abs(similarity - bestScore) < 0.001) {
+            bestIndices.push(i);
+        } else if (similarity > bestScore) {
+            bestIndices = [i];
+            bestScore = similarity;
         }
-        bestIndices.push(pair[0]);
     }
 
     // next, resolve any ties (if any) using the rest of the name
-    scores = [];    // again, stores [index, score] pairs
+    let actualBestIndex = bestIndices[0];
+    let bestSecondaryScore = 0;
     if (bestIndices.length > 1) {
         for (let i of bestIndices) {
             let name = nutrition[i]['name'];
@@ -148,22 +145,20 @@ function matchItem(item, nutrition) {
                 secondaryName = name.substring(name.indexOf(',') + 1);
             }
             let similarity = stringSimilarity.compareTwoStrings(item, secondaryName);
-            scores.push([i, similarity]);
+            if (Math.abs(similarity - bestSecondaryScore) < 0.001) {
+                // it's tied w/ the best; don't do anything
+            } else if (similarity > bestSecondaryScore) {
+                actualBestIndex = i;
+                bestSecondaryScore = similarity;
+            }
         }
-    } else {
-        scores = [[bestIndices[0], bestScore]];
     }
-    scores.sort((a, b) => b[1] - a[1]);
-    scores = scores.slice(0, 5);
-    best_5 = scores.map((pair) => [nutrition[pair[0]]['name'], bestScore]);
     if (bestScore < 0.45) {
-        // console.log(best_5);
         num_bad++;
     } else {
         num_good++;
     }
-    // console.log(best_5);
-    return best_5[0][0];
+    return nutrition[actualBestIndex]['id'];
 }
 
 /**
@@ -193,10 +188,11 @@ function normalizeRecipes(){
                     let cleanedItem = cleanItem(result[3]);
                     // console.log('Step 3');
                     // console.log(cleanedItem);
-                    let matchedItem = matchItem(cleanedItem, nutrition);
+                    let matchedItemID = matchItem(cleanedItem, nutrition);
                     // console.log('Step 4');
-                    ingredientObj['item'] = matchedItem;
-                    // console.log('\n')
+
+                    ingredientObj['ingredientFullName'] = ingredient;
+                    ingredientObj['itemID'] = matchedItemID;
                     ingredients_normalized.push(ingredientObj);
                 }
             }
@@ -208,12 +204,11 @@ function normalizeRecipes(){
     console.log('num good: ' + num_good);
     console.log('num_bad: ' + num_bad);
     let recipes_normalized_json = JSON.stringify(recipes_normalized, null, 2);
-    fs.writeFile('../data/recipes_normalized.json', recipes_normalized_json, 'utf8')
-    console.log('done')
+    fs.writeFile('../data/recipes_normalized_v2.json', recipes_normalized_json, 'utf8')
 }
 
+let now = require('performance-now');
+let t0 = now();
 normalizeRecipes()
-
-
-
-
+let t1 = now();
+console.log('normalizeRecipes took ' + ((t1 - t0) / 1000).toFixed(1) + ' s.');

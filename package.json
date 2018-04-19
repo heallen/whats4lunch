@@ -24,6 +24,7 @@
     "lemmer": "^0.3.0",
     "nodemon": "^1.17.3",
     "oracledb": "^2.2.0",
+    "performance-now": "^2.1.0",
     "string-similarity": "^1.2.0"
   }
 }
