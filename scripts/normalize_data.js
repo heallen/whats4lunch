@@ -207,8 +207,69 @@ function normalizeRecipes(){
     fs.writeFile('../data/recipes_normalized_v2.json', recipes_normalized_json, 'utf8')
 }
 
-let now = require('performance-now');
-let t0 = now();
-normalizeRecipes()
-let t1 = now();
-console.log('normalizeRecipes took ' + ((t1 - t0) / 1000).toFixed(1) + ' s.');
+function recipeTable(){
+    let recipes = require('../data/recipes_normalized_v2.json')
+    let tableRecipes = []
+
+    for(recipe of recipes){
+
+        let tableRecipe = {
+            name: recipe.title.trim(),
+            rating: recipe.rating,
+            directions: recipe.directions.join('\n'),
+            description: recipe.desc,
+        }
+
+        tableRecipes.push(tableRecipe)
+    }
+
+    let stringifiedRecipes = JSON.stringify(tableRecipes, null, 2);
+    fs.writeFile('../data/recipes_table.json', stringifiedRecipes, 'utf8')
+}
+
+function categoriesTable(){
+    let recipes = require('../data/recipes_normalized_v2.json')
+    let recipeCategories = []
+
+    for(recipe of recipes) {
+        for(category of recipe.categories) {
+            let recipeCategory = {
+                name: recipe.title.trim(),
+                category: category
+            }
+            recipeCategories.push(recipeCategory)
+        }
+    }
+
+    let stringifiedRecipes = JSON.stringify(recipeCategories, null, 2);
+    fs.writeFile('../data/categories_table.json', stringifiedRecipes, 'utf8')
+}
+
+function recipeIngredientsTable(){
+    var numQty = require("numeric-quantity");
+    let recipes = require('../data/recipes_normalized_v2.json')
+    let recipeIngredients = []
+
+    for(recipe of recipes) {
+        for(ingredient of recipe.ingredients_normalized) {
+            let recipeIngredient = {
+                recipe_name: recipe.title.trim(),
+                amount: numQty(ingredient.amount),
+                unit: ingredient.unit,
+                ingredient_name: ingredient.ingredientFullName,
+                nutrition_id: ingredient.itemID
+            }
+            recipeIngredients.push(recipeIngredient)
+        }
+    }
+
+    let stringifiedRecipes = JSON.stringify(recipeIngredients, null, 2);
+    fs.writeFile('../data/ingredients_table.json', stringifiedRecipes, 'utf8')
+}
+
+// recipeIngredientsTable()
+// let now = require('performance-now');
+// let t0 = now();
+// normalizeRecipes()
+// let t1 = now();
+// console.log('normalizeRecipes took ' + ((t1 - t0) / 1000).toFixed(1) + ' s.');

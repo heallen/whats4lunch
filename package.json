@@ -23,6 +23,7 @@
     "express": "^4.16.3",
     "lemmer": "^0.3.0",
     "nodemon": "^1.17.3",
+    "numeric-quantity": "^0.3.1",
     "oracledb": "^2.2.0",
     "performance-now": "^2.1.0",
     "string-similarity": "^1.2.0"
