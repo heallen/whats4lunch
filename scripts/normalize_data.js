@@ -210,13 +210,14 @@ function normalizeRecipes(){
 function recipeTable(){
     let recipes = require('../data/recipes_normalized_v2.json')
     let tableRecipes = []
-
+    let recipeID = 0;
     for(recipe of recipes){
-
+        recipeID += 1;
         let tableRecipe = {
+            id: recipeID,
             name: recipe.title.trim(),
             rating: recipe.rating,
-            directions: recipe.directions.join('\n'),
+            directions: recipe.directions.join('\n').substring(0, 3900),
             description: recipe.desc,
         }
 
@@ -230,11 +231,12 @@ function recipeTable(){
 function categoriesTable(){
     let recipes = require('../data/recipes_normalized_v2.json')
     let recipeCategories = []
-
+    let recipeID = 0;
     for(recipe of recipes) {
+        recipeID += 1;
         for(category of recipe.categories) {
             let recipeCategory = {
-                name: recipe.title.trim(),
+                id: recipeID,
                 category: category
             }
             recipeCategories.push(recipeCategory)
@@ -249,11 +251,17 @@ function recipeIngredientsTable(){
     var numQty = require("numeric-quantity");
     let recipes = require('../data/recipes_normalized_v2.json')
     let recipeIngredients = []
-
+    let recipeID = 0;
     for(recipe of recipes) {
+        recipeID += 1;
+        let ingredients = []
         for(ingredient of recipe.ingredients_normalized) {
+            if(ingredients.indexOf(ingredient.ingredientFullName) > -1){
+                continue;
+            }
+            ingredients.push(ingredient.ingredientFullName);
             let recipeIngredient = {
-                recipe_name: recipe.title.trim(),
+                recipe_id: recipeID,
                 amount: numQty(ingredient.amount),
                 unit: ingredient.unit,
                 ingredient_name: ingredient.ingredientFullName,
@@ -267,7 +275,7 @@ function recipeIngredientsTable(){
     fs.writeFile('../data/ingredients_table.json', stringifiedRecipes, 'utf8')
 }
 
-// recipeIngredientsTable()
+recipeIngredientsTable()
 // let now = require('performance-now');
 // let t0 = now();
 // normalizeRecipes()

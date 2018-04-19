@@ -145,8 +145,6 @@ function createIngredientsTable(connection) {
 function insertIngredients(connection) {
     var ingredients = require('../data/nutrition.json');
 
-    console.log(ingredients.slice(2, 4));
-
     connection.executeMany(
         `INSERT INTO ingredients (
             id,
@@ -256,12 +254,151 @@ function insertIngredients(connection) {
 }
 
 function createRecipesTable(connection){
-    
+    connection.execute(
+        `CREATE TABLE recipes (
+            id NUMBER PRIMARY KEY,
+            name VARCHAR2(200) NOT NULL,
+            rating FLOAT,
+            directions VARCHAR2(4000),
+            description VARCHAR2(4000)
+        )`,
+      function(err, result) {
+        if (err) {
+          console.error(err.message);
+          return;
+        }
+        console.log(result);
+    });
+}
+
+function insertRecipes(connection){
+    var recipes = require('../data/recipes_table.json');
+
+    connection.executeMany(
+        `INSERT INTO recipes (
+            id,
+            name,
+            rating,
+            directions,
+            description
+        )
+         VALUES (
+            :id,
+            :name,
+            :rating,
+            :directions,
+            :description
+        )
+        `
+    ,
+    recipes,
+    { autoCommit: true },
+    function(err, result) {
+        if (err) {
+          console.error(err.message);
+          return;
+        }
+        console.log(result);
+    });
+}
+
+function createCategoriesTable(connection){
+    connection.execute(
+        `CREATE TABLE categories (
+            id NUMBER,
+            category VARCHAR2(100),
+            PRIMARY KEY (id, category),
+            CONSTRAINT FK_cat_id FOREIGN KEY (id) REFERENCES recipes (id)
+        )`,
+      function(err, result) {
+        if (err) {
+          console.error(err.message);
+          return;
+        }
+        console.log(result);
+    });
+}
+
+function insertCategories(connection){
+    var categories = require('../data/categories_table.json');
+
+    connection.executeMany(
+        `INSERT INTO categories (
+            id,
+            category
+        )
+         VALUES (
+            :id,
+            :category
+        )
+        `
+    ,
+    categories,
+    { autoCommit: true },
+    function(err, result) {
+        if (err) {
+          console.error(err.message);
+          return;
+        }
+        console.log(result);
+    });
+}
+
+function createRecipeIngredientsTable(connection){
+    connection.execute(
+        `CREATE TABLE recipe_ingredients (
+            recipe_id NUMBER,
+            amount NUMBER,
+            unit VARCHAR2(20),
+            ingredient_name VARCHAR2(1000),
+            nutrition_id CHAR(10),
+            PRIMARY KEY (recipe_id, ingredient_name),
+            CONSTRAINT FK_ri_r FOREIGN KEY (recipe_id) REFERENCES recipes (id),
+            CONSTRAINT FK_ri_i FOREIGN KEY (nutrition_id) REFERENCES ingredients (id)
+        )`,
+      function(err, result) {
+        if (err) {
+          console.error(err.message);
+          return;
+        }
+        console.log(result);
+    });
+}
+
+function insertRecipeIngredients(connection){
+    var ingredients = require('../data/ingredients_table.json');
+
+    connection.executeMany(
+        `INSERT INTO recipe_ingredients (
+            recipe_id,
+            amount,
+            unit,
+            ingredient_name,
+            nutrition_id
+        )
+         VALUES (
+            :recipe_id,
+            :amount,
+            :unit,
+            :ingredient_name,
+            :nutrition_id
+        )
+        `
+    ,
+    ingredients,
+    { autoCommit: true },
+    function(err, result) {
+        if (err) {
+          console.error(err.message);
+          return;
+        }
+        console.log(result);
+    });
 }
 
 function miscQuery(connection){
     connection.execute(
-        `SELECT name FROM ingredients WHERE calories > 800`,
+        `DROP TABLE recipe_ingredients`,
       function(err, result) {
         if (err) {
           console.error(err.message);
@@ -277,6 +414,12 @@ function runQueries(pool){
     // getConnection(pool, getUsers)
     // getConnection(pool, createIngredientsTable)
     // getConnection(pool, insertIngredients)
-    getConnection(pool, miscQuery)
+    // getConnection(pool, createRecipesTable)
+    // getConnection(pool, insertRecipes)
+    // getConnection(pool, createCategoriesTable)
+    // getConnection(pool, insertCategories)
+    // getConnection(pool, createRecipeIngredientsTable)
+    getConnection(pool, insertRecipeIngredients)
+    // getConnection(pool, miscQuery)
 }
 
