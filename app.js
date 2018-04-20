@@ -4,6 +4,7 @@ app.set('view engine', 'ejs')
 app.use(express.static('static'))
 
 var oracledb = require('oracledb');
+oracledb.outFormat = oracledb.OBJECT;
 
 function init(){
     oracledb.createPool(
@@ -47,19 +48,7 @@ function recipesPage(req, res, pool) {
             res.send(err.message);
             return;
           }
-          // console.log(result);
-          let recipes = [];
-          for (recipe of result.rows) {
-            let recipeObj = {
-              id: recipe[0],
-              name: recipe[1], 
-              description: recipe[2], 
-              rating: recipe[3]
-            }
-            recipes.push(recipeObj)
-          }
-          // console.log(recipes)
-          res.render('pages/recipes', {recipes: recipes});
+          res.render('pages/recipes', {recipes: result.rows});
       });
     })
 }
@@ -67,6 +56,41 @@ function recipesPage(req, res, pool) {
 function recipePage(req, res, pool) {
 
   var recipeID = req.params.recipeID;
+  getConnection(pool, function(connection){
+    connection.execute(
+      `SELECT * FROM recipes
+       WHERE id = :id
+       `,
+       {id: recipeID},
+       {maxRows: 1},
+      function(err, result) {
+        if (err) {
+          console.error(err.message);
+          res.send(err.message);
+          return;
+        }
+
+        let recipe = result.rows[0];
+
+        connection.execute(
+          `SELECT * FROM recipe_ingredients
+           WHERE recipe_id = :id
+           `,
+           {id: recipeID},
+           {maxRows: 1},
+          function(err, result2) {
+            if (err) {
+              console.error(err.message);
+              res.send(err.message);
+              return;
+            }
+
+            recipe.INGREDIENTS = result2.rows;
+            console.log(recipe)
+            res.render('pages/recipe', {recipe: recipe});
+          });
+    });
+  })
 
   //make a call to get recipe information based on name/id
   var recipe = {
@@ -89,7 +113,6 @@ function recipePage(req, res, pool) {
     ],
   };
 
-  res.render('pages/recipe', {recipe: recipe});
 }
 
 function ingredientsPage(req, res, pool) {

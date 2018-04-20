@@ -249,6 +249,8 @@ function categoriesTable(){
 
 function recipeIngredientsTable(){
     var numQty = require("numeric-quantity");
+    console.log(numQty("1 1/2"));
+    return
     let recipes = require('../data/recipes_normalized_v2.json')
     let recipeIngredients = []
     let recipeID = 0;

@@ -1,4 +1,6 @@
 var oracledb = require('oracledb');
+oracledb.outFormat = oracledb.OBJECT;
+
 
 oracledb.createPool(
     {
@@ -348,8 +350,8 @@ function createRecipeIngredientsTable(connection){
     connection.execute(
         `CREATE TABLE recipe_ingredients (
             recipe_id NUMBER,
-            amount NUMBER,
-            unit VARCHAR2(20),
+            amount FLOAT,
+            unit VARCHAR2(40),
             ingredient_name VARCHAR2(1000),
             nutrition_id CHAR(10),
             PRIMARY KEY (recipe_id, ingredient_name),
@@ -367,7 +369,7 @@ function createRecipeIngredientsTable(connection){
 
 function insertRecipeIngredients(connection){
     var ingredients = require('../data/ingredients_table.json');
-
+    
     connection.executeMany(
         `INSERT INTO recipe_ingredients (
             recipe_id,
@@ -386,7 +388,13 @@ function insertRecipeIngredients(connection){
         `
     ,
     ingredients,
-    { autoCommit: true },
+    { autoCommit: true, bindDefs: {
+      recipe_id: { type: oracledb.NUMBER },
+      amount: { type: oracledb.NUMBER },
+      unit: { type: oracledb.STRING, maxSize: 40 },
+      ingredient_name: { type: oracledb.STRING, maxSize: 1000 },
+      nutrition_id: { type: oracledb.STRING, maxSize: 10 }
+    } },
     function(err, result) {
         if (err) {
           console.error(err.message);
@@ -427,8 +435,39 @@ function viewTables(connection){
 }
 
 function miscQuery(connection){
+    var ingredients = require('../data/ingredients_table.json');
+    console.log(ingredients.slice(5, 20))
+    connection.executeMany(
+        `INSERT INTO recipe_ingredients (
+            recipe_id,
+            amount,
+            unit,
+            ingredient_name,
+            nutrition_id
+        )
+         VALUES (
+            :recipe_id,
+            :amount,
+            :unit,
+            :ingredient_name,
+            :nutrition_id
+        )
+        `,
+        ingredients.slice(5, 20), {autoCommit: true, maxRows: 10},
+      function(err, result) {
+        if (err) {
+          console.error(err.message);
+          return;
+        }
+        console.log(result);
+    });
+}
+
+function miscQuery2(connection){
     connection.execute(
-        `select tablespace_name, table_name from user_tables`,
+        `SELECT amount FROM recipe_ingredients
+        `,
+        {}, {autoCommit: true, maxRows: 10},
       function(err, result) {
         if (err) {
           console.error(err.message);
@@ -451,6 +490,6 @@ function runQueries(pool){
     // getConnection(pool, createRecipeIngredientsTable)
     // getConnection(pool, insertRecipeIngredients)
     // getConnection(pool, createFavoritesTable)
-    getConnection(pool, miscQuery)
+    getConnection(pool, miscQuery2)
 }
 
