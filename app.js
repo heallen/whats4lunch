@@ -35,25 +35,31 @@ function mainPage(req, res, pool) {
 }
 
 function recipesPage(req, res, pool) {
-    var recipes = [
-      {
-        id: "Halal",
-        name: "Halal",
-        rating: 4,
-        tags: [
-          "healthy",
-          "low fat"
-        ]
-      },
-      {
-        id: "Wawa",
-        name: "Wawa",
-        rating: 5,
-        tags: [
-        ]
-      }
-    ]
-    res.render('pages/recipes', {recipes: recipes});
+    getConnection(pool, function(connection){
+      connection.execute(
+        `SELECT id, name, description, rating FROM recipes WHERE rownum < 10
+         `,
+        function(err, result) {
+          if (err) {
+            console.error(err.message);
+            res.send(err.message);
+            return;
+          }
+          // console.log(result);
+          let recipes = [];
+          for (recipe of result.rows) {
+            let recipeObj = {
+              id: recipe[0],
+              name: recipe[1], 
+              description: recipe[2], 
+              rating: recipe[3]
+            }
+            recipes.push(recipeObj)
+          }
+          // console.log(recipes)
+          res.render('pages/recipes', {recipes: recipes});
+      });
+    })
 }
 
 function recipePage(req, res, pool) {

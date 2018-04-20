@@ -14,23 +14,17 @@
           <% recipes.forEach(function(recipe) { %>
             <li class="list-group-item">
               
-              <span class="row-item">
-                <a href=<%= "recipes/" + recipe.name %>><%= recipe.name %></a>
-              </span>
+              <div class="row-item">
+                <a href=<%= "recipes/" + recipe.id %>><%= recipe.name %></a>
+              </div>
 
-              <span class="row-item">
-                <% if (recipe.tags.indexOf("healthy") != -1) { %>
-                  <span class="badge badge-pill badge-success">Healthy</span>
-                <% } %>
+              <div class="row-item description" >
+                <%= recipe.description %>
+              </div>
 
-                <% if (recipe.tags.indexOf("low fat") != -1) { %>
-                  <span class="badge badge-pill badge-warning">Low Fat</span>
-                <% } %>
-              </span>
-
-              <span class="row-item">
+              <div class="row-item">
                Rating: <%= recipe.rating %>
-              </span>
+              </div>
 
             </li>
           <% }) %>
