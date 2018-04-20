@@ -8,8 +8,25 @@
 
     <div class="pageContent">
 
-        <h2><%= recipe.name %></h2>
-        <div class="description"><%= recipe.description %></div>
+        <h2><%= recipe.NAME %></h2>
+        <div class="description"><%= recipe.DESCRIPTION %></div>
+
+        <br>
+
+        <div class="directions">
+            <h2> Directions </h2>
+            <%= recipe.DIRECTIONS %>
+        </div>
+
+        <br>
+
+        <ul class="ingredients">
+            <% recipe.INGREDIENTS.forEach(function(ingredient) { %>
+            <li class="list-group-item">
+              <%= ingredient.INGREDIENT_NAME %>
+            </li>
+          <% }) %>
+        </ul>
 
     </div>
 </body>

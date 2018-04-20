@@ -31,7 +31,6 @@ function init(){
 }
 
 function mainPage(req, res, pool) {
-    // getConnection(pool, createTables)
     res.render('pages/main');
 }
 
@@ -43,11 +42,13 @@ function recipesPage(req, res, pool) {
          {},
          {maxRows: 10},
         function(err, result) {
+          closeConnection(connection);
           if (err) {
             console.error(err.message);
             res.send(err.message);
             return;
           }
+
           res.render('pages/recipes', {recipes: result.rows});
       });
     })
@@ -77,8 +78,9 @@ function recipePage(req, res, pool) {
            WHERE recipe_id = :id
            `,
            {id: recipeID},
-           {maxRows: 1},
+           {},
           function(err, result2) {
+            closeConnection(connection);
             if (err) {
               console.error(err.message);
               res.send(err.message);
@@ -87,32 +89,11 @@ function recipePage(req, res, pool) {
 
             recipe.INGREDIENTS = result2.rows;
             console.log(recipe)
+
             res.render('pages/recipe', {recipe: recipe});
           });
     });
   })
-
-  //make a call to get recipe information based on name/id
-  var recipe = {
-    recipeID: recipeID,
-    name: "Halal",
-    rating: 4,
-    tags: [
-      "healthy",
-      "low fat"
-    ],
-    directions: [
-      "1. Place the stock, lentils, celery, carrot, thyme, and salt in a medium saucepan and bring to a boil. Reduce heat to low and simmer until the lentils are tender, about 30 minutes, depending on the lentils. (If they begin to dry out, add water as needed.) Remove and discard the thyme. Drain and transfer the mixture to a bowl; let cool.",
-      "2. Fold in the tomato, apple, lemon juice, and olive oil. Season with the pepper.",
-      "3. To assemble a wrap, place 1 lavash sheet on a clean work surface. Spread some of the lentil mixture on the end nearest you, leaving a 1-inch border. Top with several slices of turkey, then some of the lettuce. Roll up the lavash, slice crosswise, and serve. If using tortillas, spread the lentils in the center, top with the turkey and lettuce, and fold up the bottom, left side, and right side before rolling away from you."
-    ],
-    ingredients: [
-      {amount: 4, unit: "cups", item: "low-sodium vegetable or chicken stock"},
-      {amount: 1, unit: "cup", item: "dried brown lentils"},
-      {amount: 1/2, unit: "cup", item: "dried French green lentils"},
-    ],
-  };
-
 }
 
 function ingredientsPage(req, res, pool) {
@@ -129,32 +110,19 @@ function getConnection(pool, callback) {
               return;
             } 
             //perform action with connection then close it/return it to pool
-            callback(connection, function(){
-                connection.close(
-                    function(err) {
-                      if (err)
-                        console.error(err.message);
-                    }
-                );
-            });
+            callback(connection)
           }
     )
 }
 
-// follow this model to execute whatever sql queries
-function createTables(connection) {
-    connection.execute(
-      `SELECT manager_id, department_id, department_name
-       FROM departments
-       WHERE manager_id = :id`,
-      [103],  // bind value for :id
-      function(err, result) {
-        if (err) {
-          console.error(err.message);
-          return;
-        }
-        console.log(result.rows);
-    });
+// call inside callback of every getConnection callback!
+function closeConnection(connection) {
+  connection.close(
+    function(err) {
+      if (err)
+        console.error(err.message);
+    }
+  );
 }
 
 init()
