@@ -37,8 +37,10 @@ function mainPage(req, res, pool) {
 function recipesPage(req, res, pool) {
     getConnection(pool, function(connection){
       connection.execute(
-        `SELECT id, name, description, rating FROM recipes WHERE rownum < 10
+        `SELECT id, name, description, rating FROM recipes
          `,
+         {},
+         {maxRows: 10},
         function(err, result) {
           if (err) {
             console.error(err.message);
