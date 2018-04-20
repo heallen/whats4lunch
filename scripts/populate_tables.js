@@ -40,10 +40,10 @@ function getConnection(pool, callback) {
 // follow this model to execute whatever sql queries
 function createUserTable(connection) {
     connection.execute(
-        `CREATE TABLE IF NOT EXISTS users (
-            username VARCHAR2(15) PRIMARY KEY,
-            password VARCHAR2(20) NOT NULL,
-            name VARCHAR2(20),
+        `CREATE TABLE users (
+            username VARCHAR2(40) PRIMARY KEY,
+            password VARCHAR2(40) NOT NULL,
+            name VARCHAR2(40),
             gender CHAR(1)
         )`,
       function(err, result) {
@@ -396,9 +396,39 @@ function insertRecipeIngredients(connection){
     });
 }
 
+function createFavoritesTable(connection){
+    connection.execute(
+        `CREATE TABLE favorites (
+            username VARCHAR2(40),
+            recipe_id NUMBER,
+            PRIMARY KEY (username, recipe_id),
+            CONSTRAINT FK_fav_user FOREIGN KEY (username) REFERENCES users (username),
+            CONSTRAINT FK_fav_rec FOREIGN KEY (recipe_id) REFERENCES recipes (id)
+        )`,
+      function(err, result) {
+        if (err) {
+          console.error(err.message);
+          return;
+        }
+        console.log(result);
+    });
+}
+
+function viewTables(connection){
+    connection.execute(
+        `select tablespace_name, table_name from user_tables`,
+      function(err, result) {
+        if (err) {
+          console.error(err.message);
+          return;
+        }
+        console.log(result);
+    });
+}
+
 function miscQuery(connection){
     connection.execute(
-        `DROP TABLE recipe_ingredients`,
+        `select tablespace_name, table_name from user_tables`,
       function(err, result) {
         if (err) {
           console.error(err.message);
@@ -419,7 +449,8 @@ function runQueries(pool){
     // getConnection(pool, createCategoriesTable)
     // getConnection(pool, insertCategories)
     // getConnection(pool, createRecipeIngredientsTable)
-    getConnection(pool, insertRecipeIngredients)
-    // getConnection(pool, miscQuery)
+    // getConnection(pool, insertRecipeIngredients)
+    // getConnection(pool, createFavoritesTable)
+    getConnection(pool, miscQuery)
 }
 

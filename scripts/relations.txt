@@ -78,3 +78,11 @@ recipe_ingredients (
       CONSTRAINT FK_ri_r FOREIGN KEY (recipe_id) REFERENCES recipes (id),
       CONSTRAINT FK_ri_i FOREIGN KEY (nutrition_id) REFERENCES ingredients (id)
 )
+
+favorites (
+      username VARCHAR2(40),
+      recipe_id NUMBER,
+      PRIMARY KEY (username, recipe_id),
+      CONSTRAINT FK_fav_user FOREIGN KEY (username) REFERENCES users (username),
+      CONSTRAINT FK_fav_rec FOREIGN KEY (recipe_id) REFERENCES recipes (id)
+)
