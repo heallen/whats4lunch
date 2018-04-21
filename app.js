@@ -41,7 +41,7 @@ function recipesPage(req, res, pool) {
         `SELECT id, name, description, rating FROM recipes
          `,
          {},
-         {maxRows: 10},
+         {maxRows: 50},
         function(err, result) {
           closeConnection(connection);
           if (err) {
@@ -103,7 +103,7 @@ function ingredientsPage(req, res, pool) {
         `SELECT id, name FROM ingredients
          `,
          {},
-         {maxRows: 10},
+         {maxRows: 50},
         function(err, result) {
           closeConnection(connection);
           if (err) {
@@ -120,7 +120,6 @@ function ingredientsPage(req, res, pool) {
 function ingredientPage(req, res, pool) {
 
   var ingredientID = req.params.ingredientID;
-  console.log(ingredientID);
   getConnection(pool, function(connection){
     connection.execute(
       `SELECT * FROM ingredients
@@ -129,6 +128,7 @@ function ingredientPage(req, res, pool) {
        {},
        {},
       function(err, result) {
+        closeConnection(connection)
         if (err) {
           console.error(err.message);
           res.send(err.message);
