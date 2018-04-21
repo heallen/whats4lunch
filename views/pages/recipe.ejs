@@ -23,7 +23,9 @@
         <ul class="ingredients">
             <% recipe.INGREDIENTS.forEach(function(ingredient) { %>
             <li class="list-group-item">
-              <%= ingredient.INGREDIENT_NAME %>
+                <a href=<%= '/ingredients/' + ingredient.NUTRITION_ID %>>
+                    <%= ingredient.INGREDIENT_NAME %>
+                </a>
             </li>
           <% }) %>
         </ul>

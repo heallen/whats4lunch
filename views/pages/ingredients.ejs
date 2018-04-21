@@ -1,6 +1,5 @@
 <head>
     <%- include('../partials/head') %>
-    <link rel="stylesheet" type="text/css" href="styles/recipes.css">
 </head>
 
 <body>
@@ -8,11 +7,11 @@
 
     <div class="pageContent">
 
-      <div class="recipesContainer">
+      <div class="ingredientsContainer">
         <h2>Ingredients</h2>
-        <ul class="recipesList list-group list-group-flush">
+        <ul class="list-group list-group-flush">
           <% ingredients.forEach(function(ingredient) { %>
-            <li class="list-group-item"><%= ingredient %></li>
+            <li class="list-group-item"><a href=<%= "/ingredients/"+ingredient.ID %>>%><%= ingredient.NAME %></a></li>
           <% }) %>
         </ul>
       </div>

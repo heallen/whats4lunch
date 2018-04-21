@@ -25,6 +25,7 @@ function init(){
         app.get('/', (req, res) => mainPage(req, res, pool))
         app.get('/recipes/:recipeID', (req, res) => recipePage(req, res, pool))
         app.get('/recipes', (req, res) => recipesPage(req, res, pool))
+        app.get('/ingredients/:ingredientID', (req, res) => ingredientPage(req, res, pool))
         app.get('/ingredients', (req, res) => ingredientsPage(req, res, pool))
       }
     )
@@ -97,8 +98,46 @@ function recipePage(req, res, pool) {
 }
 
 function ingredientsPage(req, res, pool) {
-    var ingredientsNames = ["Chicken", "Spinach", "Bread", "Peanut Butter"]
-    res.render('pages/ingredients', {ingredients: ingredientsNames});
+     getConnection(pool, function(connection){
+      connection.execute(
+        `SELECT id, name FROM ingredients
+         `,
+         {},
+         {maxRows: 10},
+        function(err, result) {
+          closeConnection(connection);
+          if (err) {
+            console.error(err.message);
+            res.send(err.message);
+            return;
+          }
+
+          res.render('pages/ingredients', {ingredients: result.rows});
+      });
+    })
+}
+
+function ingredientPage(req, res, pool) {
+
+  var ingredientID = req.params.ingredientID;
+  console.log(ingredientID);
+  getConnection(pool, function(connection){
+    connection.execute(
+      `SELECT * FROM ingredients
+       WHERE id = ${ingredientID}
+       `,
+       {},
+       {},
+      function(err, result) {
+        if (err) {
+          console.error(err.message);
+          res.send(err.message);
+          return;
+        }
+        let ingredient = result.rows[0];
+        res.render('pages/ingredient', {ingredient: ingredient});
+    });
+  })
 }
 
 //call this function with the function callback(connection), and do whatever with that connection
