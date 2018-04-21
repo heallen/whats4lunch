@@ -27,6 +27,7 @@ function init(){
         app.get('/recipes', (req, res) => recipesPage(req, res, pool))
         app.get('/ingredients/:ingredientID', (req, res) => ingredientPage(req, res, pool))
         app.get('/ingredients', (req, res) => ingredientsPage(req, res, pool))
+        app.get('/categories/:category', (req, res) => categoryPage(req, res, pool))
       }
     )
 }
@@ -81,7 +82,6 @@ function recipePage(req, res, pool) {
            {id: recipeID},
            {},
           function(err, result2) {
-            closeConnection(connection);
             if (err) {
               console.error(err.message);
               res.send(err.message);
@@ -89,9 +89,26 @@ function recipePage(req, res, pool) {
             }
 
             recipe.INGREDIENTS = result2.rows;
-            console.log(recipe)
 
-            res.render('pages/recipe', {recipe: recipe});
+            connection.execute(
+              `SELECT category FROM categories
+               WHERE id = :id
+               `,
+               {id: recipeID},
+               {outFormat: oracledb.ARRAY},
+              function(err, result3) {
+                closeConnection(connection);
+                if (err) {
+                  console.error(err.message);
+                  res.send(err.message);
+                  return;
+                }
+
+                recipe.CATEGORIES = [].concat(...result3.rows);
+                console.log(recipe)
+
+                res.render('pages/recipe', {recipe: recipe});
+              });
           });
     });
   })
@@ -138,6 +155,29 @@ function ingredientPage(req, res, pool) {
         res.render('pages/ingredient', {ingredient: ingredient});
     });
   })
+}
+
+function categoryPage(req, res, pool) {
+    var category = req.params.category.replace(/_/g, " ");
+    getConnection(pool, function(connection){
+      connection.execute(
+        `SELECT id, name, description, rating, category
+         FROM categories NATURAL JOIN recipes
+         WHERE category = :category
+         `,
+         {category: category},
+         {maxRows: 50},
+        function(err, result) {
+          closeConnection(connection);
+          if (err) {
+            console.error(err.message);
+            res.send(err.message);
+            return;
+          }
+          console.log(result)
+          res.render('pages/recipes', {recipes: result.rows});
+      });
+    })
 }
 
 //call this function with the function callback(connection), and do whatever with that connection
