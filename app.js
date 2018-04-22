@@ -1,9 +1,11 @@
 const express = require('express')
+const session = require('express-session')
 const app = express()
 app.set('view engine', 'ejs')
 app.use(express.static('static'))
 app.use(express.json())
-
+app.use(session({secret:'LAKJD3qjds129', saveUninitialized: false, resave: false}));
+var SHA3 = require("crypto-js/sha3");
 var oracledb = require('oracledb');
 oracledb.outFormat = oracledb.OBJECT;
 
@@ -32,7 +34,7 @@ function init(){
         app.get('/categories/:category', (req, res) => categoryPage(req, res, pool))
         app.get('/categories', (req, res) => categoriesPage(req, res, pool))
 
-        app.post('/signup', registerUser);
+        app.post('/signup', (req, res) => registerUser(req, res, pool));
       }
     )
 }
@@ -201,6 +203,37 @@ function categoryPage(req, res, pool) {
     })
 }
 
+function registerUser (req, res, pool) {
+  var userInfo = req.body;
+
+  //hash the password before storing
+  userInfo.password = SHA3(userInfo.password).toString()
+  
+  getConnection(pool, function(connection){
+      connection.execute(
+        `INSERT INTO users (username, password, name, gender)
+         VALUES (:username, :password, :name, :genderRadios)
+        `,
+         userInfo,
+         {autoCommit: true},
+        function(err, result) {
+          closeConnection(connection);
+          console.log(req.session.name)
+
+          if (err) {
+            console.error(err.message);
+            res.send("failure");
+            return;
+          }
+          console.log(result)
+
+          //set session name variable to newly registered user (logged in)
+          req.session.name = userInfo.name;
+          res.send("success");
+      });
+    })
+}
+
 //call this function with the function callback(connection), and do whatever with that connection
 function getConnection(pool, callback) {
     pool.getConnection(
@@ -213,11 +246,6 @@ function getConnection(pool, callback) {
             callback(connection)
           }
     )
-}
-
-function registerUser (req, res) {
-  console.log(req.body);
-  res.send("hi")
 }
 
 // call inside callback of every getConnection callback!

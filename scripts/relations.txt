@@ -1,6 +1,6 @@
 users (
       username VARCHAR2(15) PRIMARY KEY,
-      password VARCHAR2(20) NOT NULL,
+      password CHAR(128) NOT NULL,
       name VARCHAR2(20),
       gender CHAR(1)
 )

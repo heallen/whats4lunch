@@ -44,7 +44,7 @@ function createUserTable(connection) {
     connection.execute(
         `CREATE TABLE users (
             username VARCHAR2(40) PRIMARY KEY,
-            password VARCHAR2(40) NOT NULL,
+            password CHAR(128) NOT NULL,
             name VARCHAR2(40),
             gender CHAR(1)
         )`,
@@ -465,7 +465,7 @@ function miscQuery(connection){
 
 function miscQuery2(connection){
     connection.execute(
-        `SELECT amount FROM recipe_ingredients
+        `SELECT * FROM users
         `,
         {}, {autoCommit: true, maxRows: 10},
       function(err, result) {
@@ -478,7 +478,7 @@ function miscQuery2(connection){
 }
 
 function runQueries(pool){
-    // getConnection(pool, createUserTable)
+    getConnection(pool, createUserTable)
     // getConnection(pool, insertUserValue)
     // getConnection(pool, getUsers)
     // getConnection(pool, createIngredientsTable)
