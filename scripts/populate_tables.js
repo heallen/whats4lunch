@@ -478,7 +478,7 @@ function miscQuery2(connection){
 }
 
 function runQueries(pool){
-    getConnection(pool, createUserTable)
+    // getConnection(pool, createUserTable)
     // getConnection(pool, insertUserValue)
     // getConnection(pool, getUsers)
     // getConnection(pool, createIngredientsTable)

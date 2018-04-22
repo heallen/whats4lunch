@@ -9,6 +9,13 @@ var SHA3 = require("crypto-js/sha3");
 var oracledb = require('oracledb');
 oracledb.outFormat = oracledb.OBJECT;
 
+app.use(function (req, res, next) {
+   res.locals = {
+     name: req.session.name
+   };
+   next();
+});
+
 function init(){
     oracledb.createPool(
         {
@@ -35,8 +42,14 @@ function init(){
         app.get('/categories', (req, res) => categoriesPage(req, res, pool))
 
         app.post('/signup', (req, res) => registerUser(req, res, pool));
+        app.get('/logout', logout)
       }
     )
+}
+
+function logout(req, res) {
+  req.session.name = "";
+  res.redirect("/");
 }
 
 function recipesPage(req, res, pool) {
@@ -208,14 +221,14 @@ function registerUser (req, res, pool) {
 
   //hash the password before storing
   userInfo.password = SHA3(userInfo.password).toString()
-  
+
   getConnection(pool, function(connection){
       connection.execute(
         `INSERT INTO users (username, password, name, gender)
          VALUES (:username, :password, :name, :genderRadios)
         `,
          userInfo,
-         {autoCommit: true},
+         {autoCommit: false},
         function(err, result) {
           closeConnection(connection);
           console.log(req.session.name)

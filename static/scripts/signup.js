@@ -1,4 +1,5 @@
 $(function() {
+
     $("#submit-btn").click(function(e){
         e.preventDefault();
         if(!$("#usernameInput").val() || !$("#passwordInput").val() || !$("#nameInput").val()){
@@ -24,6 +25,8 @@ $(function() {
                         $("#passwordInput").val('')
                         $("#nameInput").val('')
                         $("#usernameInput").focus()
+                    } else {
+                        window.location.replace("/")
                     }
                 }
             });
