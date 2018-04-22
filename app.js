@@ -34,6 +34,8 @@ function init(){
         app.listen(3000, () => console.log('Example app listening on port 3000!'))
         app.get('/', (req, res) => res.render('pages/main'))
         app.get('/signup', (req, res) => res.render('pages/signup'))
+        app.get('/login', (req, res) => res.render('pages/login'))
+
         app.get('/recipes/:recipeID', (req, res) => recipePage(req, res, pool))
         app.get('/recipes', (req, res) => recipesPage(req, res, pool))
         app.get('/ingredients/:ingredientID', (req, res) => ingredientPage(req, res, pool))
@@ -42,6 +44,7 @@ function init(){
         app.get('/categories', (req, res) => categoriesPage(req, res, pool))
 
         app.post('/signup', (req, res) => registerUser(req, res, pool));
+        app.post('/login', (req, res) => loginUser(req, res, pool));
         app.get('/logout', logout)
       }
     )
@@ -231,7 +234,6 @@ function registerUser (req, res, pool) {
          {autoCommit: false},
         function(err, result) {
           closeConnection(connection);
-          console.log(req.session.name)
 
           if (err) {
             console.error(err.message);
@@ -242,6 +244,39 @@ function registerUser (req, res, pool) {
 
           //set session name variable to newly registered user (logged in)
           req.session.name = userInfo.name;
+          res.send("success");
+      });
+    })
+}
+
+function loginUser (req, res, pool) {
+  var userInfo = req.body;
+  //hash the password before storing
+  userInfo.password = SHA3(userInfo.password).toString()
+
+  getConnection(pool, function(connection){
+      connection.execute(
+        `SELECT name FROM users
+         WHERE username = :username AND password = :password
+        `,
+         userInfo,
+         {outFormat: oracledb.ARRAY},
+        function(err, result) {
+          closeConnection(connection);
+
+          console.log(result)
+          
+          if (err) {
+            console.log(err)
+            res.send("failure");
+            return;
+          } else if (result.rows.length == 0) {
+            res.send("failure")
+            return;
+          }
+
+          //set session name variable to logged in user
+          req.session.name = result.rows[0][0];
           res.send("success");
       });
     })

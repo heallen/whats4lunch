@@ -1,9 +1,9 @@
 <style>
-  a {
+  nav a {
     color: black;
   }
 
-  a:hover{
+  nav a:hover{
     text-decoration: none;
   }
 </style>
@@ -31,12 +31,14 @@
         Sign Up
       </button>
     </a>
-    <button 
+    <a href="/login">
+      <button 
       class="nav-item nav-link btn"
       style="margin: 0px 20px"
       id="login-btn">
         Log In
-    </button>
+      </button>
+    </a>
   <% } else { %>
     <div>
       Hello, <%= name %>

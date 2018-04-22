@@ -1,0 +1,22 @@
+<head>
+    <%- include('../partials/head') %>
+</head>
+
+<body>
+    <%- include('../partials/navbar') %>
+    <div class="pageContent">
+        <h1> Log In </h1>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="usernameInput">Username</label>
+            <input type="text" class="form-control" id="usernameInput" name="username" placeholder="Enter username">
+          </div>
+          <div class="form-group">
+            <label for="passwordInput">Password</label>
+            <input type="password" class="form-control" id="passwordInput" name="password" placeholder="Password">
+          </div>
+          <button class="btn btn-success" id="submit-btn">Submit</button>
+        </form>
+    </div>
+    <script src="/scripts/login.js"></script>
+</body>
