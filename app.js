@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 app.set('view engine', 'ejs')
 app.use(express.static('static'))
+app.use(express.json())
 
 var oracledb = require('oracledb');
 oracledb.outFormat = oracledb.OBJECT;
@@ -22,19 +23,18 @@ function init(){
 
         // add all routes here, pass pool into those that need it
         app.listen(3000, () => console.log('Example app listening on port 3000!'))
-        app.get('/', (req, res) => mainPage(req, res, pool))
+        app.get('/', (req, res) => res.render('pages/main'))
+        app.get('/signup', (req, res) => res.render('pages/signup'))
         app.get('/recipes/:recipeID', (req, res) => recipePage(req, res, pool))
         app.get('/recipes', (req, res) => recipesPage(req, res, pool))
         app.get('/ingredients/:ingredientID', (req, res) => ingredientPage(req, res, pool))
         app.get('/ingredients', (req, res) => ingredientsPage(req, res, pool))
         app.get('/categories/:category', (req, res) => categoryPage(req, res, pool))
         app.get('/categories', (req, res) => categoriesPage(req, res, pool))
+
+        app.post('/signup', registerUser);
       }
     )
-}
-
-function mainPage(req, res, pool) {
-    res.render('pages/main');
 }
 
 function recipesPage(req, res, pool) {
@@ -213,6 +213,11 @@ function getConnection(pool, callback) {
             callback(connection)
           }
     )
+}
+
+function registerUser (req, res) {
+  console.log(req.body);
+  res.send("hi")
 }
 
 // call inside callback of every getConnection callback!
