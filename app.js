@@ -28,6 +28,7 @@ function init(){
         app.get('/ingredients/:ingredientID', (req, res) => ingredientPage(req, res, pool))
         app.get('/ingredients', (req, res) => ingredientsPage(req, res, pool))
         app.get('/categories/:category', (req, res) => categoryPage(req, res, pool))
+        app.get('/categories', (req, res) => categoriesPage(req, res, pool))
       }
     )
 }
@@ -155,6 +156,26 @@ function ingredientPage(req, res, pool) {
         res.render('pages/ingredient', {ingredient: ingredient});
     });
   })
+}
+
+function categoriesPage(req, res, pool) {
+     getConnection(pool, function(connection){
+      connection.execute(
+        `SELECT category FROM categories
+         `,
+         {},
+         {maxRows: 50, outFormat: oracledb.ARRAY},
+        function(err, result) {
+          closeConnection(connection);
+          if (err) {
+            console.error(err.message);
+            res.send(err.message);
+            return;
+          }
+          console.log(result)
+          res.render('pages/categories', {categories: result.rows});
+      });
+    })
 }
 
 function categoryPage(req, res, pool) {

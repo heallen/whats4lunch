@@ -1,0 +1,21 @@
+<head>
+    <%- include('../partials/head') %>
+</head>
+
+<body>
+    <%- include('../partials/navbar') %>
+
+    <div class="pageContent">
+
+      <div class="ingredientsContainer">
+        <h2>Categories</h2>
+        <ul class="list-group list-group-flush">
+          <% categories.forEach(function(category) { %>
+            <li class="list-group-item"><a href=<%= "/categories/" + category[0].replace(/ /g, "_") %>>%><%= category %></a></li>
+          <% }) %>
+        </ul>
+      </div>
+
+
+    </div>
+</body>
