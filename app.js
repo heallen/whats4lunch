@@ -11,7 +11,8 @@ oracledb.outFormat = oracledb.OBJECT;
 
 app.use(function (req, res, next) {
    res.locals = {
-     name: req.session.name
+     name: req.session.name,
+     username: req.session.username
    };
    next();
 });
@@ -43,14 +44,16 @@ function init(){
         app.get('/categories/:category', (req, res) => categoryPage(req, res, pool))
         app.get('/categories', (req, res) => categoriesPage(req, res, pool))
 
+        app.post('/addfavorite', (req, res) => addToFavorites(req, res, pool));
         app.post('/signup', (req, res) => registerUser(req, res, pool));
         app.post('/login', (req, res) => loginUser(req, res, pool));
-        app.get('/logout', logout)
+        app.get('/logout', logout);
       }
     )
 }
 
 function logout(req, res) {
+  req.session.username = "";
   req.session.name = "";
   res.redirect("/");
 }
@@ -87,6 +90,7 @@ function recipePage(req, res, pool) {
        {maxRows: 1},
       function(err, result) {
         if (err) {
+          closeConnection(connection);
           console.error(err.message);
           res.send(err.message);
           return;
@@ -102,6 +106,7 @@ function recipePage(req, res, pool) {
            {},
           function(err, result2) {
             if (err) {
+              closeConnection(connection);
               console.error(err.message);
               res.send(err.message);
               return;
@@ -116,21 +121,47 @@ function recipePage(req, res, pool) {
                {id: recipeID},
                {outFormat: oracledb.ARRAY},
               function(err, result3) {
-                closeConnection(connection);
                 if (err) {
+                  closeConnection(connection);
                   console.error(err.message);
                   res.send(err.message);
                   return;
                 }
 
                 recipe.CATEGORIES = [].concat(...result3.rows);
-                console.log(recipe)
+                console.log(recipe);
 
-                res.render('pages/recipe', {recipe: recipe});
-              });
-          });
-    });
-  })
+                // if logged in, check if recipe in favorites
+                if(req.session.name){
+                  connection.execute(
+                    `SELECT username FROM favorites
+                     WHERE username = :username AND recipe_id = :recipe_id
+                     `,
+                     {username: req.session.username, recipe_id: recipeID},
+                     {outFormat: oracledb.ARRAY},
+                    function(err, result4) {
+                      closeConnection(connection);
+                      if (err) {
+                        console.error(err.message);
+                        res.send(err.message);
+                        return;
+                      }
+                      let inFavorites = result4.rows.length != 0;
+                      res.render('pages/recipe', {recipe: recipe, inFavorites: inFavorites});
+                    }
+                  );
+                } else {
+                  closeConnection(connection)
+                  res.render('pages/recipe', {recipe: recipe, inFavorites: false});
+                }
+                
+              }
+            );
+          }
+        );
+      }
+    );
+  });
 }
 
 function ingredientsPage(req, res, pool) {
@@ -243,6 +274,7 @@ function registerUser (req, res, pool) {
           console.log(result)
 
           //set session name variable to newly registered user (logged in)
+          req.session.username = userInfo.username;
           req.session.name = userInfo.name;
           res.send("success");
       });
@@ -256,7 +288,7 @@ function loginUser (req, res, pool) {
 
   getConnection(pool, function(connection){
       connection.execute(
-        `SELECT name FROM users
+        `SELECT username, name FROM users
          WHERE username = :username AND password = :password
         `,
          userInfo,
@@ -276,7 +308,32 @@ function loginUser (req, res, pool) {
           }
 
           //set session name variable to logged in user
-          req.session.name = result.rows[0][0];
+          req.session.username = result.rows[0][0];
+          req.session.name = result.rows[0][1];
+          res.send("success");
+      });
+    })
+}
+
+function addToFavorites (req, res, pool) {
+  var username = req.session.username;
+  var recipe_id = req.body.recipe_id;
+  getConnection(pool, function(connection){
+      connection.execute(
+        `INSERT INTO favorites (username, recipe_id)
+         VALUES (:username, :recipe_id)
+        `,
+         {username: username, recipe_id: recipe_id},
+         {autoCommit: true},
+        function(err, result) {
+          closeConnection(connection);
+          console.log(result)
+          
+          if (err) {
+            console.log(err)
+            res.send(err);
+            return;
+          }
           res.send("success");
       });
     })

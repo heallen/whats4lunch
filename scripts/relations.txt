@@ -1,7 +1,7 @@
 users (
-      username VARCHAR2(15) PRIMARY KEY,
+      username VARCHAR2(40) PRIMARY KEY,
       password CHAR(128) NOT NULL,
-      name VARCHAR2(20),
+      name VARCHAR2(40),
       gender CHAR(1)
 )
 

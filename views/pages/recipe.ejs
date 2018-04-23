@@ -11,7 +11,7 @@
         <h1><%= recipe.NAME %></h1>
         <div class="description"><%= recipe.DESCRIPTION %></div>
 
-        <br>
+        <br/>
 
         <div class="directions">
             <h3> Directions </h3>
@@ -38,7 +38,12 @@
                     <%= category %>
                 </a>
             </span>
-          <% }) %>
+        <% }) %>
+        <br/><br/>
 
+        <% if(name && !inFavorites) { %>
+            <button id="add-fav-btn" class="btn btn-primary">Add to Favorites</button>
+        <% } %>
     </div>
+    <script src="/scripts/recipe.js"></script>
 </body>
