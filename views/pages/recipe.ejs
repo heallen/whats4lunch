@@ -1,5 +1,12 @@
 <head>
     <%- include('../partials/head') %>
+    <style>
+        #nutrition-table, #recipes-list {
+            max-height: 100%;
+            overflow-y: auto;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -19,17 +26,239 @@
 
         <br>
 
-        <h3>Ingredients</h3>
-        <ul class="ingredients">
-            <% recipe.INGREDIENTS.forEach(function(ingredient) { %>
-            <li class="list-group-item">
-                <a href=<%= '/ingredients/' + ingredient.NUTRITION_ID %>>
-                    <%= ingredient.INGREDIENT_NAME %>
-                </a>
-            </li>
-          <% }) %>
-        </ul>
+        <div class="row">
+            <div id="ingredients-container" class="col-sm-6">
+                <h3>Ingredients</h3>
+                <ul class="list-group list-group-flush">
+                    <% recipe.INGREDIENTS.forEach(function(ingredient) { %>
+                    <li class="list-group-item">
+                        <a href=<%= '/ingredients/' + ingredient.NUTRITION_ID %>>
+                            <%= ingredient.INGREDIENT_NAME %>
+                        </a>
+                    </li>
+                  <% }) %>
+                </ul>
+            </div>
 
+            <div id="nutrition-container" class="col-sm-6">
+                <h3>Nutrition</h3>
+                <div id="nutrition-table">
+                    <table class="table table-hover table-responsive">
+                        <thead>
+                            <tr>
+                                <th scope="col">Item</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col">Units</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Water</td>
+                                <td><%= recipeNutrition.WATER %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Calories</td>
+                                <td><%= recipeNutrition.CALORIES %></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Protein</td>
+                                <td><%= recipeNutrition.PROTEIN %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Total Fat</td>
+                                <td><%= recipeNutrition.TOTAL_FAT %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Saturated Fat</td>
+                                <td><%= recipeNutrition.SATURATED_FAT %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Monounsaturated Fat</td>
+                                <td><%= recipeNutrition.MONOUNSATURATED_FAT %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Polyunsaturated Fat</td>
+                                <td><%= recipeNutrition.POLYUNSATURATED_FAT %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Carbohydrates</td>
+                                <td><%= recipeNutrition.CARBOHYDRATES %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Sugar</td>
+                                <td><%= recipeNutrition.SUGAR %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Sodium</td>
+                                <td><%= recipeNutrition.SODIUM %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Fiber</td>
+                                <td><%= recipeNutrition.FIBER %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Calcium</td>
+                                <td><%= recipeNutrition.CALCIUM %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Iron</td>
+                                <td><%= recipeNutrition.IRON %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Cholesterol</td>
+                                <td><%= recipeNutrition.CHOLESTEROL %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Potassium</td>
+                                <td><%= recipeNutrition.POTASSIUM %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Zinc</td>
+                                <td><%= recipeNutrition.ZINC %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Copper</td>
+                                <td><%= recipeNutrition.COPPER %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Magnesium</td>
+                                <td><%= recipeNutrition.MAGNESIUM %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Ash</td>
+                                <td><%= recipeNutrition.ASH %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Phosphorus</td>
+                                <td><%= recipeNutrition.PHOSPHORUS %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Manganese</td>
+                                <td><%= recipeNutrition.MANGANESE %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Selenium</td>
+                                <td><%= recipeNutrition.SELENIUM %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamin C</td>
+                                <td><%= recipeNutrition.VITAMIN_C %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Thiamin</td>
+                                <td><%= recipeNutrition.THIAMIN %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Riboflavin</td>
+                                <td><%= recipeNutrition.RIBOFLAVIN %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Niacin</td>
+                                <td><%= recipeNutrition.NIACIN %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Panto Acid</td>
+                                <td><%= recipeNutrition.PANTO_ACID %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Niacin</td>
+                                <td><%= recipeNutrition.NIACIN %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamin B6</td>
+                                <td><%= recipeNutrition.VITAMIN_B6 %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Folate Total</td>
+                                <td><%= recipeNutrition.FOLATE_TOTAL %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                            <tr>
+                                <td>Folic Acid</td>
+                                <td><%= recipeNutrition.FOLIC_ACID %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                            <tr>
+                                <td>Food Folate</td>
+                                <td><%= recipeNutrition.FOOD_FOLATE %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                            <tr>
+                                <td>Folate DFE</td>
+                                <td><%= recipeNutrition.FOLATE_DFE %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamin B12</td>
+                                <td><%= recipeNutrition.VITAMIN_B12 %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamin A</td>
+                                <td><%= recipeNutrition.VITAMIN_A %></td>
+                                <td>IU</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamin E</td>
+                                <td><%= recipeNutrition.VITAMIN_E %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamin D</td>
+                                <td><%= recipeNutrition.VITAMIN_D %></td>
+                                <td>IU</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamin K</td>
+                                <td><%= recipeNutrition.VITAMIN_K %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                            <tr>
+                                <td>Choline</td>
+                                <td><%= recipeNutrition.CHOLINE %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Retinol</td>
+                                <td><%= recipeNutrition.RETINOL %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                        </tbody>   
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <br>
         <h3>Categories</h3>
         <% recipe.CATEGORIES.forEach(function(category) { %>
             <span style="padding-right: 10px;">

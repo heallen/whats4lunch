@@ -152,32 +152,99 @@ function recipePage(req, res, pool) {
                 }
 
                 recipe.CATEGORIES = [].concat(...result3.rows);
-                // console.log(recipe);
 
-                // if logged in, check if recipe in favorites
-                if(req.session.name){
-                  connection.execute(
-                    `SELECT username FROM favorites
-                     WHERE username = :username AND recipe_id = :recipe_id
-                     `,
-                     {username: req.session.username, recipe_id: recipeID},
-                     {outFormat: oracledb.ARRAY},
-                    function(err, result4) {
+                connection.execute(
+                  `SELECT ri.recipe_id,
+                        SUM(water/(ri.MASS/100)) AS water,
+                        SUM(i.calories/(ri.MASS/100)) AS calories,
+                        SUM(i.protein/(ri.MASS/100)) AS protein,
+                        SUM(i.total_fat/(ri.MASS/100)) AS total_fat,
+                        SUM(i.ash/(ri.MASS/100)) AS ash,
+                        SUM(i.carbohydrates/(ri.MASS/100)) AS carbohydrates,
+                        SUM(i.fiber/(ri.MASS/100)) AS fiber,
+                        SUM(i.sugar/(ri.MASS/100)) AS sugar,
+                        SUM(i.calcium/(ri.MASS/100)) AS calcium,
+                        SUM(i.iron/(ri.MASS/100)) AS iron,
+                        SUM(i.magnesium/(ri.MASS/100)) AS magnesium,
+                        SUM(i.phosphorus/(ri.MASS/100)) AS phosphorus,
+                        SUM(i.potassium/(ri.MASS/100)) AS potassium,
+                        SUM(i.sodium/(ri.MASS/100)) AS sodium,
+                        SUM(i.zinc/(ri.MASS/100)) AS zinc,
+                        SUM(i.copper/(ri.MASS/100)) AS copper,
+                        SUM(i.manganese/(ri.MASS/100)) AS manganese,
+                        SUM(i.selenium/(ri.MASS/100)) AS selenium,
+                        SUM(i.vitamin_C/(ri.MASS/100)) AS vitamin_C,
+                        SUM(i.thiamin/(ri.MASS/100)) AS thiamin,
+                        SUM(i.riboflavin/(ri.MASS/100)) AS riboflavin,
+                        SUM(i.niacin/(ri.MASS/100)) AS niacin,
+                        SUM(i.panto_acid/(ri.MASS/100)) AS panto_acid,
+                        SUM(i.vitamin_B6/(ri.MASS/100)) AS vitamin_B6,
+                        SUM(i.folate_total/(ri.MASS/100)) AS folate_total,
+                        SUM(i.folic_acid/(ri.MASS/100)) AS folic_acid,
+                        SUM(i.food_folate/(ri.MASS/100)) AS food_folate,
+                        SUM(i.folate_DFE/(ri.MASS/100)) AS folate_DFE,
+                        SUM(i.choline/(ri.MASS/100)) AS choline,
+                        SUM(i.vitamin_B12/(ri.MASS/100)) AS vitamin_B12,
+                        SUM(i.vitamin_A/(ri.MASS/100)) AS vitamin_A,
+                        SUM(i.retinol/(ri.MASS/100)) AS recipe_ingredients,
+                        SUM(i.vitamin_E/(ri.MASS/100)) AS vitamin_E,
+                        SUM(i.vitamin_D/(ri.MASS/100)) AS vitamin_D,
+                        SUM(i.vitamin_K/(ri.MASS/100)) AS vitamin_K,
+                        SUM(i.saturated_fat/(ri.MASS/100)) AS saturated_fat,
+                        SUM(i.monounsaturated_fat/(ri.MASS/100)) AS monounsaturated_fat,
+                        SUM(i.polyunsaturated_fat/(ri.MASS/100)) AS polyunsaturated_fat,
+                        SUM(i.cholesterol/(ri.MASS/100))  AS cholesterol
+                     FROM recipe_ingredients ri JOIN ingredients i
+                     ON ri.nutrition_id = i.id 
+                     WHERE recipe_id = :recipe_id
+                     GROUP BY ri.recipe_id
+                   `,
+                   {recipe_id: recipeID},
+                   {maxRows: 1},
+                  function(err, result4) {
+                    if (err) {
                       closeConnection(connection);
-                      if (err) {
-                        console.error(err.message);
-                        res.send(err.message);
-                        return;
-                      }
-                      let inFavorites = result4.rows.length != 0;
-                      res.render('pages/recipe', {recipe: recipe, inFavorites: inFavorites});
+                      console.error(err.message);
+                      res.send(err.message);
+                      return;
                     }
-                  );
-                } else {
-                  closeConnection(connection)
-                  res.render('pages/recipe', {recipe: recipe, inFavorites: false});
-                }
-                
+
+                    let recipeNutrition = result4.rows[0];
+                    //truncate the float values
+                    for(key in recipeNutrition) {
+                      if(recipeNutrition[key] > 100000) {
+                        recipeNutrition[key] = 0;
+                      }
+                      if(recipeNutrition[key]){
+                        recipeNutrition[key] = recipeNutrition[key].toString().substr(0, 6);
+                      }
+                    }
+
+                    // if logged in, check if recipe in favorites
+                    if(req.session.name){
+                      connection.execute(
+                        `SELECT username FROM favorites
+                         WHERE username = :username AND recipe_id = :recipe_id
+                         `,
+                         {username: req.session.username, recipe_id: recipeID},
+                         {outFormat: oracledb.ARRAY},
+                        function(err, result5) {
+                          closeConnection(connection);
+                          if (err) {
+                            console.error(err.message);
+                            res.send(err.message);
+                            return;
+                          }
+                          let inFavorites = result5.rows.length != 0;
+                          res.render('pages/recipe', {recipe: recipe, recipeNutrition: recipeNutrition, inFavorites: inFavorites});
+                        }
+                      );
+                    } else {
+                      closeConnection(connection)
+                      res.render('pages/recipe', {recipe: recipe, recipeNutrition: recipeNutrition, inFavorites: false});
+                    }
+                  }
+                )
               }
             );
           }

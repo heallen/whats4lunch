@@ -1,22 +1,10 @@
 <head>
     <%- include('../partials/head') %>
     <style>
-        h2 {
-            cursor: pointer;
-        }
-
-        img{
-            width: 30px;
-            height: 30px;
-        }
-
         #nutrition-table, #recipes-list {
             max-height: 100%;
             overflow-y: auto;
         }
-
-
-
     </style>
 </head>
 
@@ -254,15 +242,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        $(function(){
-            $("#nutrition-header").click(function(e){
-                $("#nutrition-table").slideToggle(1000);
-            })
-            $("#recipes-header").click(e => {
-                $("#recipes-list").slideToggle(500);
-            })
-        })
-    </script>
 </body>

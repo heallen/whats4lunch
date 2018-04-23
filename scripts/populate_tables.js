@@ -350,8 +350,7 @@ function createRecipeIngredientsTable(connection){
     connection.execute(
         `CREATE TABLE recipe_ingredients (
             recipe_id NUMBER,
-            amount FLOAT,
-            unit VARCHAR2(40),
+            mass FLOAT,
             ingredient_name VARCHAR2(1000),
             nutrition_id CHAR(10),
             PRIMARY KEY (recipe_id, ingredient_name),
@@ -368,20 +367,18 @@ function createRecipeIngredientsTable(connection){
 }
 
 function insertRecipeIngredients(connection){
-    var ingredients = require('../data/ingredients_table.json');
+    var ingredients = require('../data/ingredients_table_filled.json');
     
     connection.executeMany(
         `INSERT INTO recipe_ingredients (
             recipe_id,
-            amount,
-            unit,
+            mass,
             ingredient_name,
             nutrition_id
         )
          VALUES (
             :recipe_id,
-            :amount,
-            :unit,
+            :mass,
             :ingredient_name,
             :nutrition_id
         )
@@ -390,8 +387,7 @@ function insertRecipeIngredients(connection){
     ingredients,
     { autoCommit: true, bindDefs: {
       recipe_id: { type: oracledb.NUMBER },
-      amount: { type: oracledb.NUMBER },
-      unit: { type: oracledb.STRING, maxSize: 40 },
+      mass: { type: oracledb.NUMBER },
       ingredient_name: { type: oracledb.STRING, maxSize: 1000 },
       nutrition_id: { type: oracledb.STRING, maxSize: 10 }
     } },
@@ -477,7 +473,50 @@ function miscQuery(connection){
 
 function miscQuery2(connection){
     connection.execute(
-        `SELECT * FROM favorites
+        `SELECT ri.recipe_id,
+            SUM(water/(ri.MASS/100)) AS water,
+            SUM(i.calories/(ri.MASS/100)) AS calories,
+            SUM(i.protein/(ri.MASS/100)) AS protein,
+            SUM(i.total_fat/(ri.MASS/100)) AS total_fat,
+            SUM(i.ash/(ri.MASS/100)) AS ash,
+            SUM(i.carbohydrates/(ri.MASS/100)) AS carbohydrates,
+            SUM(i.fiber/(ri.MASS/100)) AS fiber,
+            SUM(i.sugar/(ri.MASS/100)) AS sugar,
+            SUM(i.calcium/(ri.MASS/100)) AS calcium,
+            SUM(i.iron/(ri.MASS/100)) AS iron,
+            SUM(i.magnesium/(ri.MASS/100)) AS magnesium,
+            SUM(i.phosphorus/(ri.MASS/100)) AS phosphorus,
+            SUM(i.potassium/(ri.MASS/100)) AS potassium,
+            SUM(i.sodium/(ri.MASS/100)) AS sodium,
+            SUM(i.zinc/(ri.MASS/100)) AS zinc,
+            SUM(i.copper/(ri.MASS/100)) AS copper,
+            SUM(i.manganese/(ri.MASS/100)) AS manganese,
+            SUM(i.selenium/(ri.MASS/100)) AS selenium,
+            SUM(i.vitamin_C/(ri.MASS/100)) AS vitamin_C,
+            SUM(i.thiamin/(ri.MASS/100)) AS thiamin,
+            SUM(i.riboflavin/(ri.MASS/100)) AS riboflavin,
+            SUM(i.niacin/(ri.MASS/100)) AS niacin,
+            SUM(i.panto_acid/(ri.MASS/100)) AS panto_acid,
+            SUM(i.vitamin_B6/(ri.MASS/100)) AS vitamin_B6,
+            SUM(i.folate_total/(ri.MASS/100)) AS folate_total,
+            SUM(i.folic_acid/(ri.MASS/100)) AS folic_acid,
+            SUM(i.food_folate/(ri.MASS/100)) AS food_folate,
+            SUM(i.folate_DFE/(ri.MASS/100)) AS folate_DFE,
+            SUM(i.choline/(ri.MASS/100)) AS choline,
+            SUM(i.vitamin_B12/(ri.MASS/100)) AS vitamin_B12,
+            SUM(i.vitamin_A/(ri.MASS/100)) AS vitamin_A,
+            SUM(i.retinol/(ri.MASS/100)) AS recipe_ingredients,
+            SUM(i.vitamin_E/(ri.MASS/100)) AS vitamin_E,
+            SUM(i.vitamin_D/(ri.MASS/100)) AS vitamin_D,
+            SUM(i.vitamin_K/(ri.MASS/100)) AS vitamin_K,
+            SUM(i.saturated_fat/(ri.MASS/100)) AS saturated_fat,
+            SUM(i.monounsaturated_fat/(ri.MASS/100)) AS monounsaturated_fat,
+            SUM(i.polyunsaturated_fat/(ri.MASS/100)) AS polyunsaturated_fat,
+            SUM(i.cholesterol/(ri.MASS/100))  AS cholesterol
+         FROM recipe_ingredients ri JOIN ingredients i
+         ON ri.nutrition_id = i.id 
+         WHERE recipe_id = 2
+         GROUP BY ri.recipe_id
         `,
         {}, {autoCommit: true, maxRows: 10},
       function(err, result) {
@@ -502,7 +541,7 @@ function runQueries(pool){
     // getConnection(pool, createRecipeIngredientsTable)
     // getConnection(pool, insertRecipeIngredients)
     // getConnection(pool, createFavoritesTable)
-    getConnection(pool, createRecipeNameIndex)
-    // getConnection(pool, miscQuery2)
+    // getConnection(pool, createRecipeNameIndex)
+    getConnection(pool, miscQuery2)
 }
 
