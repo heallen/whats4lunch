@@ -9,6 +9,17 @@
 
       <div class="ingredientsContainer">
         <h2>Ingredients</h2>
+
+        <% if(pageNum == 1) { %>
+          <button style="display: none" id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
+          <button id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
+        <% } else { %>
+          <button id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
+          <button id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
+        <% } %>
+
+        <br><br>
+
         <ul class="list-group list-group-flush">
           <% ingredients.forEach(function(ingredient) { %>
             <li class="list-group-item"><a href=<%= "/ingredients/"+ingredient.ID %>>%><%= ingredient.NAME %></a></li>
@@ -16,6 +27,7 @@
         </ul>
       </div>
 
-
     </div>
+
+    <script src="/scripts/ingredients.js"></script>
 </body>

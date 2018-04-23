@@ -41,6 +41,7 @@ function init(){
         app.get('/recipes/page/:pageNum', (req, res) => recipesPage(req, res, pool))
         app.get('/recipes/:recipeID', (req, res) => recipePage(req, res, pool))
         app.get('/recipes', (req, res) => recipesPage(req, res, pool))
+        app.get('/ingredients/page/:pageNum', (req, res) => ingredientsPage(req, res, pool))
         app.get('/ingredients/:ingredientID', (req, res) => ingredientPage(req, res, pool))
         app.get('/ingredients', (req, res) => ingredientsPage(req, res, pool))
         app.get('/categories/:category', (req, res) => categoryPage(req, res, pool))
@@ -185,23 +186,39 @@ function recipePage(req, res, pool) {
 }
 
 function ingredientsPage(req, res, pool) {
-     getConnection(pool, function(connection){
-      connection.execute(
-        `SELECT id, name FROM ingredients
-         `,
-         {},
-         {maxRows: 50},
-        function(err, result) {
-          closeConnection(connection);
-          if (err) {
-            console.error(err.message);
-            res.send(err.message);
-            return;
-          }
+    let pageNum = req.params.pageNum;
+    let ingredientsPerPage = 10;
+    if(!pageNum){
+      pageNum = 1;
+    }
 
-          res.render('pages/ingredients', {ingredients: result.rows});
-      });
-    })
+    // if cached results
+    if(req.session.ingredients && pageNum * ingredientsPerPage < req.session.ingredients.length) {
+      res.render('pages/ingredients', {pageNum: pageNum, ingredients: req.session.ingredients.slice(
+        (pageNum - 1) * ingredientsPerPage, pageNum * ingredientsPerPage)});
+    } 
+    // else pull next 100 from DB
+    else {
+      getConnection(pool, function(connection){
+        connection.execute(
+          `SELECT id, name FROM ingredients
+           ORDER BY name
+           `,
+           {},
+           {maxRows: pageNum * ingredientsPerPage + 100},
+          function(err, result) {
+            closeConnection(connection);
+            if (err) {
+              console.error(err.message);
+              res.send(err.message);
+              return;
+            }
+            req.session.ingredients = result.rows;
+            res.render('pages/ingredients', {pageNum: pageNum, ingredients: result.rows.slice(
+              (pageNum - 1) * ingredientsPerPage, pageNum * ingredientsPerPage)});
+        });
+      })
+    }
 }
 
 function ingredientPage(req, res, pool) {
