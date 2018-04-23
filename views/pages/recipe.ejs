@@ -1,6 +1,5 @@
 <head>
     <%- include('../partials/head') %>
-    <link rel="stylesheet" type="text/css" href="/styles/recipes.css">
 </head>
 
 <body>
@@ -46,7 +45,7 @@
             <button id="remove-fav-btn" class="btn btn-danger">Remove From Favorites</button>
         <% } %>
         <% if(name && !inFavorites) { %>
-            <button id="add-fav-btn" class="btn btn-danger">Add From Favorites</button>
+            <button id="add-fav-btn" class="btn btn-primary">Add From Favorites</button>
             <button id="remove-fav-btn" class="btn btn-danger" style="display:none;">Remove From Favorites</button>
         <% } %>
     </div>

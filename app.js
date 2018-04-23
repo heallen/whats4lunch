@@ -43,6 +43,7 @@ function init(){
         app.get('/ingredients', (req, res) => ingredientsPage(req, res, pool))
         app.get('/categories/:category', (req, res) => categoryPage(req, res, pool))
         app.get('/categories', (req, res) => categoriesPage(req, res, pool))
+        app.get('/favorites', (req, res) => favoritesPage(req, res, pool))
 
         app.post('/addfavorite', (req, res) => addToFavorites(req, res, pool));
         app.post('/removefavorite', (req, res) => removeFromFavorites(req, res, pool));
@@ -232,7 +233,7 @@ function categoryPage(req, res, pool) {
     var category = req.params.category.replace(/_/g, " ");
     getConnection(pool, function(connection){
       connection.execute(
-        `SELECT id, name, description, rating, category
+        `SELECT id, name, description, rating
          FROM categories NATURAL JOIN recipes
          WHERE category = :category
          `,
@@ -246,10 +247,41 @@ function categoryPage(req, res, pool) {
             return;
           }
           console.log(result)
-          res.render('pages/recipes', {recipes: result.rows});
+          res.render('pages/category', {recipes: result.rows, category: category});
       });
     })
 }
+
+function favoritesPage(req, res, pool) {
+    var username = req.session.username;
+    if(!username) {
+      res.send("failure")
+    } else {
+      getConnection(pool, function(connection){
+        connection.execute(
+          `SELECT id, name, description, rating
+           FROM favorites f JOIN recipes r ON f.recipe_id = r.id
+           WHERE username = :username
+           `,
+           {username: username},
+           {maxRows: 50},
+          function(err, result) {
+            closeConnection(connection);
+            if (err) {
+              console.error(err.message);
+              res.send(err.message);
+              return;
+            }
+            console.log(result)
+            res.render('pages/favorites', {recipes: result.rows});
+        });
+      })
+    }
+}
+
+/*****************************************************************/
+
+
 
 function registerUser (req, res, pool) {
   var userInfo = req.body;
