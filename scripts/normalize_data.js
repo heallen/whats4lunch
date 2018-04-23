@@ -4,7 +4,7 @@ let fs = require('fs');
 function prettifyRecipes(){
     let raw_recipes = require('../data/recipes_raw.json')
     let stringifiedRecipes = JSON.stringify(raw_recipes, null, 2);
-    fs.writeFile('../data/recipes.json', stringifiedRecipes, 'utf8')
+    fs.writeFile('../data/recipes.json', stringifiedRecipes, 'utf8');
     console.log('done')
 }
 
@@ -68,7 +68,7 @@ function jsonifyNutrition(){
         }
     });
     let stringifiedNutrition = JSON.stringify(result['ABBREV'], null, 2);
-    fs.writeFile('../data/nutrition.json', stringifiedNutrition, 'utf8')
+    fs.writeFile('../data/nutrition.json', stringifiedNutrition, 'utf8');
     console.log('done')
 }
 
@@ -204,14 +204,14 @@ function normalizeRecipes(){
     console.log('num good: ' + num_good);
     console.log('num_bad: ' + num_bad);
     let recipes_normalized_json = JSON.stringify(recipes_normalized, null, 2);
-    fs.writeFile('../data/recipes_normalized_v2.json', recipes_normalized_json, 'utf8')
+    fs.writeFile('../data/recipes_normalized_v2.json', recipes_normalized_json, 'utf8');
 }
 
 function recipeTable(){
     let recipes = require('../data/recipes_normalized_v2.json')
     let tableRecipes = []
     let recipeID = 0;
-    for(recipe of recipes){
+    for (recipe of recipes){
         recipeID += 1;
         let tableRecipe = {
             id: recipeID,
@@ -225,14 +225,14 @@ function recipeTable(){
     }
 
     let stringifiedRecipes = JSON.stringify(tableRecipes, null, 2);
-    fs.writeFile('../data/recipes_table.json', stringifiedRecipes, 'utf8')
+    fs.writeFile('../data/recipes_table.json', stringifiedRecipes, 'utf8');
 }
 
 function categoriesTable(){
     let recipes = require('../data/recipes_normalized_v2.json')
     let recipeCategories = []
     let recipeID = 0;
-    for(recipe of recipes) {
+    for (recipe of recipes) {
         recipeID += 1;
         for(category of recipe.categories) {
             let recipeCategory = {
@@ -244,21 +244,21 @@ function categoriesTable(){
     }
 
     let stringifiedRecipes = JSON.stringify(recipeCategories, null, 2);
-    fs.writeFile('../data/categories_table.json', stringifiedRecipes, 'utf8')
+    fs.writeFile('../data/categories_table.json', stringifiedRecipes, 'utf8');
 }
 
 function recipeIngredientsTable(){
-    var numQty = require("numeric-quantity");
+    let numQty = require("numeric-quantity");
     console.log(numQty("1 1/2"));
     return
     let recipes = require('../data/recipes_normalized_v2.json')
     let recipeIngredients = []
     let recipeID = 0;
-    for(recipe of recipes) {
+    for (recipe of recipes) {
         recipeID += 1;
         let ingredients = []
-        for(ingredient of recipe.ingredients_normalized) {
-            if(ingredients.indexOf(ingredient.ingredientFullName) > -1){
+        for (ingredient of recipe.ingredients_normalized) {
+            if (ingredients.indexOf(ingredient.ingredientFullName) > -1) {
                 continue;
             }
             ingredients.push(ingredient.ingredientFullName);
@@ -274,10 +274,107 @@ function recipeIngredientsTable(){
     }
 
     let stringifiedRecipes = JSON.stringify(recipeIngredients, null, 2);
-    fs.writeFile('../data/ingredients_table.json', stringifiedRecipes, 'utf8')
+    fs.writeFile('../data/ingredients_table.json', stringifiedRecipes, 'utf8');
 }
 
-recipeIngredientsTable()
+let equivalences = [
+    ["cup", "cups"],
+    ["teaspoon", "teaspoons", "tsp", "tsps"],
+    ["tablespoon", "tablespoons", "tbsp", "tbsps"],
+    ["pound", "pounds", "lb", "lbs"],
+    ["ounce", "ounces", "oz"]
+]
+/**
+ * Determines whether two units of measurement are the same unit
+ * @param {string} unit1
+ * @param {string} unit2
+ * @returns {boolean}
+ */
+function unitsEquals(unit1, unit2) {
+    unit1 = unit1.toLowerCase();
+    unit2 = unit2.toLowerCase();
+    for (equiv_class of equivalences) {
+        if (equiv_class.includes(unit1) && equiv_class.includes(unit2)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * For every object in ingredients_table.json, this function adds the mass of
+ * that ingredient (in g) The resulting data is saved to a file. If the
+ * "nutrition_id", "amount", and "unit" triplet doesn't match anything in
+ * nutrition.json, this function guesses 100 g of the ingredient with id
+ * nutrition_id.
+ */
+function computeIngredientMasses() {
+    // Loads JSON object
+    let ingredients = require('../data/ingredients_table.json');
+    let nutrition = require('../data/nutrition.json');
+
+    let numIngredients = ingredients.length
+    let iter = 0;
+    let num_found = 0;
+    let num_not_found = 0;
+    let ingredients_table_filled = []
+    for (let ingredient of ingredients) {
+        let found_mass = false;
+        if (!(ingredient["nutrition_id"]
+                && ingredient["amount"]
+                && ingredient["unit"])) {
+            ingredient["mass"] = 100;
+        } else {
+            let nutrition_obj = nutrition.find((obj) => {
+                return obj["id"] == ingredient["nutrition_id"];
+            });
+
+            let mass = 100;
+            let gmwt1_res = nutrition_obj["gmwt1desc"].match(/((?:\d+ )?\d+(?:\/\d+)?)\ (cups?|teaspoons?|tablespoons?|pounds?|ounces? )?(.*)/i);
+            if (gmwt1_res) {
+                let nutrition_amount = parseInt(gmwt1_res[1]);
+                let nutrition_unit = gmwt1_res[2];
+                if (nutrition_amount != undefined
+                        && nutrition_unit != undefined
+                        && unitsEquals(ingredient["unit"], nutrition_unit)) {
+                    mass = ingredient["amount"] / nutrition_amount * nutrition_obj["gmwt1"];
+                    found_mass = true;
+                }
+            }
+            if (!found_mass) {
+                let gmwt2_res = nutrition_obj["gmwt2desc"].match(/((?:\d+ )?\d+(?:\/\d+)?)\ (cups?|teaspoons?|tablespoons?|pounds?|ounces? )?(.*)/i);
+                if (gmwt2_res) {
+                    let nutrition_amount = parseInt(gmwt2_res[1]);
+                    let nutrition_unit = gmwt2_res[2];
+                    if (nutrition_amount != undefined
+                            && nutrition_unit != undefined
+                            && unitsEquals(ingredient["unit"], nutrition_unit)) {
+                        mass = ingredient["amount"] / nutrition_amount * nutrition_obj["gmwt2"];
+                        found_mass = true;
+                    }
+                }
+            }
+            ingredient["mass"] = mass;
+        }
+        ingredients_table_filled.push(ingredient);
+
+        // potentially useful information
+        if (found_mass) { num_found++; }
+        else { num_not_found++; }
+        if (iter % 2000 == 0) {
+            console.log(iter + " of " + numIngredients);
+        }
+        iter++;
+    }
+    console.log("num matched: " + num_found);
+    console.log("num not matched: " + num_not_found);
+    let json = JSON.stringify(ingredients_table_filled, null, 2);
+    fs.writeFile('../data/ingredients_table_filled.json', json, 'utf8');
+}
+
+computeIngredientMasses();
+
+// recipeIngredientsTable()
 // let now = require('performance-now');
 // let t0 = now();
 // normalizeRecipes()
