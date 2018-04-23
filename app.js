@@ -44,6 +44,7 @@ function init(){
         app.get('/ingredients/page/:pageNum', (req, res) => ingredientsPage(req, res, pool))
         app.get('/ingredients/:ingredientID', (req, res) => ingredientPage(req, res, pool))
         app.get('/ingredients', (req, res) => ingredientsPage(req, res, pool))
+        app.get('/categories/page/:pageNum', (req, res) => categoriesPage(req, res, pool))
         app.get('/categories/:category', (req, res) => categoryPage(req, res, pool))
         app.get('/categories', (req, res) => categoriesPage(req, res, pool))
         app.get('/favorites', (req, res) => favoritesPage(req, res, pool))
@@ -255,23 +256,39 @@ function ingredientPage(req, res, pool) {
 }
 
 function categoriesPage(req, res, pool) {
-     getConnection(pool, function(connection){
-      connection.execute(
-        `SELECT category FROM categories
-         `,
-         {},
-         {maxRows: 50, outFormat: oracledb.ARRAY},
-        function(err, result) {
-          closeConnection(connection);
-          if (err) {
-            console.error(err.message);
-            res.send(err.message);
-            return;
-          }
-          console.log(result)
-          res.render('pages/categories', {categories: result.rows});
-      });
-    })
+    let pageNum = req.params.pageNum;
+    let categoriesPerPage = 10;
+    if(!pageNum){
+      pageNum = 1;
+    }
+
+    // if cached results
+    if(req.session.categories && pageNum * categoriesPerPage < req.session.categories.length) {
+      res.render('pages/categories', {pageNum: pageNum, categories: req.session.categories.slice(
+        (pageNum - 1) * categoriesPerPage, pageNum * categoriesPerPage)});
+    } 
+    // else pull next 100 from DB
+    else {
+      getConnection(pool, function(connection){
+        connection.execute(
+          `SELECT DISTINCT category FROM categories
+           ORDER BY category
+           `,
+           {},
+           {maxRows: pageNum * categoriesPerPage + 100, outFormat: oracledb.ARRAY},
+          function(err, result) {
+            closeConnection(connection);
+            if (err) {
+              console.error(err.message);
+              res.send(err.message);
+              return;
+            }
+            req.session.categories = result.rows;
+            res.render('pages/categories', {pageNum: pageNum, categories: result.rows.slice(
+              (pageNum - 1) * categoriesPerPage, pageNum * categoriesPerPage)});
+        });
+      })
+    }
 }
 
 function categoryPage(req, res, pool) {

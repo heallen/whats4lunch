@@ -9,13 +9,23 @@
 
       <div class="ingredientsContainer">
         <h2>Categories</h2>
+        
+        <% if(pageNum == 1) { %>
+          <button style="display: none" id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
+          <button id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
+        <% } else { %>
+          <button id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
+          <button id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
+        <% } %>
+
+        <br><br>
+
         <ul class="list-group list-group-flush">
           <% categories.forEach(function(category) { %>
             <li class="list-group-item"><a href=<%= "/categories/" + category[0].replace(/ /g, "_") %>>%><%= category %></a></li>
           <% }) %>
         </ul>
       </div>
-
-
+      <script src="/scripts/pagination.js"></script>
     </div>
 </body>
