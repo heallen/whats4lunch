@@ -45,6 +45,7 @@ function init(){
         app.get('/categories', (req, res) => categoriesPage(req, res, pool))
 
         app.post('/addfavorite', (req, res) => addToFavorites(req, res, pool));
+        app.post('/removefavorite', (req, res) => removeFromFavorites(req, res, pool));
         app.post('/signup', (req, res) => registerUser(req, res, pool));
         app.post('/login', (req, res) => loginUser(req, res, pool));
         app.get('/logout', logout);
@@ -322,6 +323,30 @@ function addToFavorites (req, res, pool) {
       connection.execute(
         `INSERT INTO favorites (username, recipe_id)
          VALUES (:username, :recipe_id)
+        `,
+         {username: username, recipe_id: recipe_id},
+         {autoCommit: true},
+        function(err, result) {
+          closeConnection(connection);
+          console.log(result)
+          
+          if (err) {
+            console.log(err)
+            res.send(err);
+            return;
+          }
+          res.send("success");
+      });
+    })
+}
+
+function removeFromFavorites (req, res, pool) {
+  var username = req.session.username;
+  var recipe_id = req.body.recipe_id;
+  getConnection(pool, function(connection){
+      connection.execute(
+        `DELETE from favorites
+         WHERE username = :username AND recipe_id = :recipe_id
         `,
          {username: username, recipe_id: recipe_id},
          {autoCommit: true},

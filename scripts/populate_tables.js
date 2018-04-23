@@ -465,7 +465,7 @@ function miscQuery(connection){
 
 function miscQuery2(connection){
     connection.execute(
-        `SELECT * FROM users
+        `SELECT * FROM favorites
         `,
         {}, {autoCommit: true, maxRows: 10},
       function(err, result) {

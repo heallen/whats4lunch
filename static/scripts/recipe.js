@@ -10,10 +10,25 @@ $(function() {
             success: function(data) {
                 if (data == "success") {
                     $("#add-fav-btn").hide();
-                    //hide remove from fav button
+                    $("#remove-fav-btn").show();
+                } else {
+                    alert(data);
+                }
+            }
+        });
+    });
 
-                    //indicate that it was added to favorites
-                    alert("Added to favorites")
+    $("#remove-fav-btn").click(function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify({recipe_id: location.href.substr(location.href.lastIndexOf("/") + 1)}),
+            contentType: 'application/json',
+            url: '/removefavorite',                      
+            success: function(data) {
+                if (data == "success") {
+                    $("#remove-fav-btn").hide();
+                    $("#add-fav-btn").show();
                 } else {
                     alert(data);
                 }

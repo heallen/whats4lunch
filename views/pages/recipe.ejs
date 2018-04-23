@@ -41,8 +41,13 @@
         <% }) %>
         <br/><br/>
 
+        <% if(name && inFavorites) { %>
+            <button id="add-fav-btn" class="btn btn-primary" style="display:none;">Add To Favorites</button>
+            <button id="remove-fav-btn" class="btn btn-danger">Remove From Favorites</button>
+        <% } %>
         <% if(name && !inFavorites) { %>
-            <button id="add-fav-btn" class="btn btn-primary">Add to Favorites</button>
+            <button id="add-fav-btn" class="btn btn-danger">Add From Favorites</button>
+            <button id="remove-fav-btn" class="btn btn-danger" style="display:none;">Remove From Favorites</button>
         <% } %>
     </div>
     <script src="/scripts/recipe.js"></script>
