@@ -152,7 +152,7 @@ function recipePage(req, res, pool) {
                 }
 
                 recipe.CATEGORIES = [].concat(...result3.rows);
-                console.log(recipe);
+                // console.log(recipe);
 
                 // if logged in, check if recipe in favorites
                 if(req.session.name){
@@ -232,9 +232,8 @@ function ingredientPage(req, res, pool) {
        WHERE id = ${ingredientID}
        `,
        {},
-       {},
+       {maxRows: 1},
       function(err, result) {
-        closeConnection(connection)
         if (err) {
           console.error(err.message);
           res.send(err.message);
@@ -251,8 +250,29 @@ function ingredientPage(req, res, pool) {
             ingredient[key] = ingredient[key].toString().substr(0, 6);
           }
         }
-        res.render('pages/ingredient', {ingredient: ingredient});
-    });
+
+        connection.execute(
+          `SELECT recipe_id, name
+           FROM recipes r JOIN recipe_ingredients ri
+           ON r.id = ri.recipe_id
+           WHERE ri.nutrition_id = ${ingredientID}
+           `,
+           {},
+           {maxRows: 50},
+          function(err, result2) {
+            closeConnection(connection)
+            if (err) {
+              console.error(err.message);
+              res.send(err.message);
+              return;
+            }
+            let recipes = result2.rows;
+            // console.log(recipes);
+            res.render('pages/ingredient', {ingredient: ingredient, recipes: recipes});
+          }
+        )
+      }
+    );
   })
 }
 
@@ -309,7 +329,7 @@ function categoryPage(req, res, pool) {
             res.send(err.message);
             return;
           }
-          console.log(result)
+          // console.log(result)
           res.render('pages/category', {recipes: result.rows, category: category});
       });
     })

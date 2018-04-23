@@ -1,5 +1,23 @@
 <head>
     <%- include('../partials/head') %>
+    <style>
+        h2 {
+            cursor: pointer;
+        }
+
+        img{
+            width: 30px;
+            height: 30px;
+        }
+
+        #nutrition-table, #recipes-list {
+            max-height: 100%;
+            overflow-y: auto;
+        }
+
+
+
+    </style>
 </head>
 
 <body>
@@ -7,217 +25,244 @@
 
     <div class="pageContent">
 
-        <h2><%= ingredient.NAME %> (per 100g)</h2>
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th scope="col">Item</th>
-                    <th scope="col">Amount</th>
-                    <th scope="col">Units</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Water</td>
-                    <td><%= ingredient.WATER %></td>
-                    <td>Grams</td>
-                </tr>
-                <tr>
-                    <td>Calories</td>
-                    <td><%= ingredient.CALORIES %></td>
-                    <td>Grams</td>
-                </tr>
-                <tr>
-                    <td>Protein</td>
-                    <td><%= ingredient.PROTEIN %></td>
-                    <td>Grams</td>
-                </tr>
-                <tr>
-                    <td>Total Fat</td>
-                    <td><%= ingredient.TOTAL_FAT %></td>
-                    <td>Grams</td>
-                </tr>
-                <tr>
-                    <td>Saturated Fat</td>
-                    <td><%= ingredient.SATURATED_FAT %></td>
-                    <td>Grams</td>
-                </tr>
-                <tr>
-                    <td>Monounsaturated Fat</td>
-                    <td><%= ingredient.MONOUNSATURATED_FAT %></td>
-                    <td>Grams</td>
-                </tr>
-                <tr>
-                    <td>Polyunsaturated Fat</td>
-                    <td><%= ingredient.POLYUNSATURATED_FAT %></td>
-                    <td>Grams</td>
-                </tr>
-                <tr>
-                    <td>Carbohydrates</td>
-                    <td><%= ingredient.CARBOHYDRATES %></td>
-                    <td>Grams</td>
-                </tr>
-                <tr>
-                    <td>Sugar</td>
-                    <td><%= ingredient.SUGAR %></td>
-                    <td>Grams</td>
-                </tr>
-                <tr>
-                    <td>Sodium</td>
-                    <td><%= ingredient.SODIUM %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Fiber</td>
-                    <td><%= ingredient.FIBER %></td>
-                    <td>Grams</td>
-                </tr>
-                <tr>
-                    <td>Calcium</td>
-                    <td><%= ingredient.CALCIUM %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Iron</td>
-                    <td><%= ingredient.IRON %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Cholesterol</td>
-                    <td><%= ingredient.CHOLESTEROL %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Potassium</td>
-                    <td><%= ingredient.POTASSIUM %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Zinc</td>
-                    <td><%= ingredient.ZINC %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Copper</td>
-                    <td><%= ingredient.COPPER %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Magnesium</td>
-                    <td><%= ingredient.MAGNESIUM %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Ash</td>
-                    <td><%= ingredient.ASH %></td>
-                    <td>Grams</td>
-                </tr>
-                <tr>
-                    <td>Phosphorus</td>
-                    <td><%= ingredient.PHOSPHORUS %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Manganese</td>
-                    <td><%= ingredient.MANGANESE %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Selenium</td>
-                    <td><%= ingredient.SELENIUM %></td>
-                    <td>Micrograms</td>
-                </tr>
-                <tr>
-                    <td>Vitamin C</td>
-                    <td><%= ingredient.VITAMIN_C %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Thiamin</td>
-                    <td><%= ingredient.THIAMIN %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Riboflavin</td>
-                    <td><%= ingredient.RIBOFLAVIN %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Niacin</td>
-                    <td><%= ingredient.NIACIN %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Panto Acid</td>
-                    <td><%= ingredient.PANTO_ACID %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Niacin</td>
-                    <td><%= ingredient.NIACIN %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Vitamin B6</td>
-                    <td><%= ingredient.VITAMIN_B6 %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Folate Total</td>
-                    <td><%= ingredient.FOLATE_TOTAL %></td>
-                    <td>Micrograms</td>
-                </tr>
-                <tr>
-                    <td>Folic Acid</td>
-                    <td><%= ingredient.FOLIC_ACID %></td>
-                    <td>Micrograms</td>
-                </tr>
-                <tr>
-                    <td>Food Folate</td>
-                    <td><%= ingredient.FOOD_FOLATE %></td>
-                    <td>Micrograms</td>
-                </tr>
-                <tr>
-                    <td>Folate DFE</td>
-                    <td><%= ingredient.FOLATE_DFE %></td>
-                    <td>Micrograms</td>
-                </tr>
-                <tr>
-                    <td>Vitamin B12</td>
-                    <td><%= ingredient.VITAMIN_B12 %></td>
-                    <td>Micrograms</td>
-                </tr>
-                <tr>
-                    <td>Vitamin A</td>
-                    <td><%= ingredient.VITAMIN_A %></td>
-                    <td>IU</td>
-                </tr>
-                <tr>
-                    <td>Vitamin E</td>
-                    <td><%= ingredient.VITAMIN_E %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Vitamin D</td>
-                    <td><%= ingredient.VITAMIN_D %></td>
-                    <td>IU</td>
-                </tr>
-                <tr>
-                    <td>Vitamin K</td>
-                    <td><%= ingredient.VITAMIN_K %></td>
-                    <td>Micrograms</td>
-                </tr>
-                <tr>
-                    <td>Choline</td>
-                    <td><%= ingredient.CHOLINE %></td>
-                    <td>Milligrams</td>
-                </tr>
-                <tr>
-                    <td>Retinol</td>
-                    <td><%= ingredient.RETINOL %></td>
-                    <td>Micrograms</td>
-                </tr>
-            </tbody>   
-        </table>
+        <h1><%= ingredient.NAME %></h1>
+        <div class="row">
+            <div id="nutrition-container" class="col-sm-6">
+                <h2 id="nutrition-header">Nutrition Information (per 100g)</h2>
+                <div id="nutrition-table">
+                    <table class="table table-hover table-responsive">
+                        <thead>
+                            <tr>
+                                <th scope="col">Item</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col">Units</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Water</td>
+                                <td><%= ingredient.WATER %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Calories</td>
+                                <td><%= ingredient.CALORIES %></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Protein</td>
+                                <td><%= ingredient.PROTEIN %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Total Fat</td>
+                                <td><%= ingredient.TOTAL_FAT %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Saturated Fat</td>
+                                <td><%= ingredient.SATURATED_FAT %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Monounsaturated Fat</td>
+                                <td><%= ingredient.MONOUNSATURATED_FAT %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Polyunsaturated Fat</td>
+                                <td><%= ingredient.POLYUNSATURATED_FAT %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Carbohydrates</td>
+                                <td><%= ingredient.CARBOHYDRATES %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Sugar</td>
+                                <td><%= ingredient.SUGAR %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Sodium</td>
+                                <td><%= ingredient.SODIUM %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Fiber</td>
+                                <td><%= ingredient.FIBER %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Calcium</td>
+                                <td><%= ingredient.CALCIUM %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Iron</td>
+                                <td><%= ingredient.IRON %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Cholesterol</td>
+                                <td><%= ingredient.CHOLESTEROL %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Potassium</td>
+                                <td><%= ingredient.POTASSIUM %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Zinc</td>
+                                <td><%= ingredient.ZINC %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Copper</td>
+                                <td><%= ingredient.COPPER %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Magnesium</td>
+                                <td><%= ingredient.MAGNESIUM %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Ash</td>
+                                <td><%= ingredient.ASH %></td>
+                                <td>Grams</td>
+                            </tr>
+                            <tr>
+                                <td>Phosphorus</td>
+                                <td><%= ingredient.PHOSPHORUS %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Manganese</td>
+                                <td><%= ingredient.MANGANESE %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Selenium</td>
+                                <td><%= ingredient.SELENIUM %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamin C</td>
+                                <td><%= ingredient.VITAMIN_C %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Thiamin</td>
+                                <td><%= ingredient.THIAMIN %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Riboflavin</td>
+                                <td><%= ingredient.RIBOFLAVIN %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Niacin</td>
+                                <td><%= ingredient.NIACIN %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Panto Acid</td>
+                                <td><%= ingredient.PANTO_ACID %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Niacin</td>
+                                <td><%= ingredient.NIACIN %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamin B6</td>
+                                <td><%= ingredient.VITAMIN_B6 %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Folate Total</td>
+                                <td><%= ingredient.FOLATE_TOTAL %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                            <tr>
+                                <td>Folic Acid</td>
+                                <td><%= ingredient.FOLIC_ACID %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                            <tr>
+                                <td>Food Folate</td>
+                                <td><%= ingredient.FOOD_FOLATE %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                            <tr>
+                                <td>Folate DFE</td>
+                                <td><%= ingredient.FOLATE_DFE %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamin B12</td>
+                                <td><%= ingredient.VITAMIN_B12 %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamin A</td>
+                                <td><%= ingredient.VITAMIN_A %></td>
+                                <td>IU</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamin E</td>
+                                <td><%= ingredient.VITAMIN_E %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamin D</td>
+                                <td><%= ingredient.VITAMIN_D %></td>
+                                <td>IU</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamin K</td>
+                                <td><%= ingredient.VITAMIN_K %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                            <tr>
+                                <td>Choline</td>
+                                <td><%= ingredient.CHOLINE %></td>
+                                <td>Milligrams</td>
+                            </tr>
+                            <tr>
+                                <td>Retinol</td>
+                                <td><%= ingredient.RETINOL %></td>
+                                <td>Micrograms</td>
+                            </tr>
+                        </tbody>   
+                    </table>
+                </div>
+            </div>
+
+            <div id="recipes-container" class="col-sm-6">
+                <h2 id="recipes-header">Recipes that use <%= ingredient.NAME %></h2>
+                <ul id="recipes-list" class="list-group list-group-flush">
+                  <% recipes.forEach(function(recipe) { %>
+                    <li class="list-group-item"><a href=<%= "/recipes/"+recipe.RECIPE_ID %>>%><%= recipe.NAME %></a></li>
+                  <% }) %>
+                </ul>
+            </div>
+        </div>
     </div>
+
+    <script>
+        $(function(){
+            $("#nutrition-header").click(function(e){
+                $("#nutrition-table").slideToggle(1000);
+            })
+            $("#recipes-header").click(e => {
+                $("#recipes-list").slideToggle(500);
+            })
+        })
+    </script>
 </body>
