@@ -36,6 +36,7 @@ function init(){
         app.get('/', (req, res) => res.render('pages/main'))
         app.get('/signup', (req, res) => res.render('pages/signup'))
         app.get('/login', (req, res) => res.render('pages/login'))
+        app.get('/search', (req, res) => res.render('pages/search'))
 
         app.get('/recipes/:recipeID', (req, res) => recipePage(req, res, pool))
         app.get('/recipes', (req, res) => recipesPage(req, res, pool))
@@ -204,6 +205,14 @@ function ingredientPage(req, res, pool) {
           return;
         }
         let ingredient = result.rows[0];
+
+        //truncate the float values
+        for(key in ingredient) {
+          if(ingredient[key] > 100000) {
+            ingredient[key] = 0;
+          }
+          ingredient[key] = ingredient[key].toString().substr(0, 6);
+        }
         res.render('pages/ingredient', {ingredient: ingredient});
     });
   })
