@@ -38,6 +38,7 @@ function init(){
         app.get('/login', (req, res) => res.render('pages/login'))
         app.get('/search', (req, res) => res.render('pages/search'))
 
+        app.get('/recipes/page/:pageNum', (req, res) => recipesPage(req, res, pool))
         app.get('/recipes/:recipeID', (req, res) => recipePage(req, res, pool))
         app.get('/recipes', (req, res) => recipesPage(req, res, pool))
         app.get('/ingredients/:ingredientID', (req, res) => ingredientPage(req, res, pool))
@@ -56,29 +57,45 @@ function init(){
 }
 
 function logout(req, res) {
-  req.session.username = "";
-  req.session.name = "";
+  req.session.username = undefined;
+  req.session.name = undefined;
   res.redirect("/");
 }
 
 function recipesPage(req, res, pool) {
-    getConnection(pool, function(connection){
-      connection.execute(
-        `SELECT id, name, description, rating FROM recipes
-         `,
-         {},
-         {maxRows: 50},
-        function(err, result) {
-          closeConnection(connection);
-          if (err) {
-            console.error(err.message);
-            res.send(err.message);
-            return;
-          }
+    let pageNum = req.params.pageNum;
+    let recipesPerPage = 10;
+    if(!pageNum){
+      pageNum = 1;
+    }
 
-          res.render('pages/recipes', {recipes: result.rows});
-      });
-    })
+    // if cached results
+    if(req.session.recipes && pageNum * recipesPerPage < req.session.recipes.length) {
+      res.render('pages/recipes', {pageNum: pageNum, recipes: req.session.recipes.slice(
+        (pageNum - 1) * recipesPerPage, pageNum * recipesPerPage)});
+    } 
+    // else pull next 100 from DB
+    else {
+      getConnection(pool, function(connection){
+        connection.execute(
+          `SELECT id, name, description, rating FROM recipes
+           ORDER BY name
+           `,
+           {},
+           {maxRows: pageNum * recipesPerPage + 100},
+          function(err, result) {
+            closeConnection(connection);
+            if (err) {
+              console.error(err.message);
+              res.send(err.message);
+              return;
+            }
+            req.session.recipes = result.rows;
+            res.render('pages/recipes', {pageNum: pageNum, recipes: result.rows.slice(
+              (pageNum - 1) * recipesPerPage, pageNum * recipesPerPage)});
+        });
+      })
+    }
 }
 
 function recipePage(req, res, pool) {
@@ -211,7 +228,9 @@ function ingredientPage(req, res, pool) {
           if(ingredient[key] > 100000) {
             ingredient[key] = 0;
           }
-          ingredient[key] = ingredient[key].toString().substr(0, 6);
+          if(ingredient[key]){
+            ingredient[key] = ingredient[key].toString().substr(0, 6);
+          }
         }
         res.render('pages/ingredient', {ingredient: ingredient});
     });

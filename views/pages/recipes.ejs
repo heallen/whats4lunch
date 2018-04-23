@@ -9,6 +9,17 @@
 
       <div class="recipesContainer">
         <h2>Recipes</h2>
+
+        <% if(pageNum == 1) { %>
+          <button style="display: none" id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
+          <button id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
+        <% } else { %>
+          <button id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
+          <button id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
+        <% } %>
+
+        <br><br>
+
         <ul class="recipesList list-group list-group-flush">
           <% recipes.forEach(function(recipe) { %>
             <li class="list-group-item">
@@ -29,7 +40,6 @@
           <% }) %>
         </ul>
       </div>
-
-
     </div>
+    <script src="/scripts/recipes.js"></script>
 </body>
