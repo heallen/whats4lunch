@@ -9,6 +9,7 @@ var SHA3 = require("crypto-js/sha3");
 var oracledb = require('oracledb');
 oracledb.outFormat = oracledb.OBJECT;
 
+//makes the session variables available to all responses
 app.use(function (req, res, next) {
    res.locals = {
      name: req.session.name,

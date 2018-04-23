@@ -434,6 +434,18 @@ function viewTables(connection){
     });
 }
 
+function createRecipeNameIndex(connection){
+    connection.execute(
+        `CREATE INDEX recipe_name_i ON recipes (name)`,
+      function(err, result) {
+        if (err) {
+          console.error(err.message);
+          return;
+        }
+        console.log(result);
+    });
+}
+
 function miscQuery(connection){
     var ingredients = require('../data/ingredients_table.json');
     console.log(ingredients.slice(5, 20))
@@ -490,6 +502,7 @@ function runQueries(pool){
     // getConnection(pool, createRecipeIngredientsTable)
     // getConnection(pool, insertRecipeIngredients)
     // getConnection(pool, createFavoritesTable)
-    getConnection(pool, miscQuery2)
+    getConnection(pool, createRecipeNameIndex)
+    // getConnection(pool, miscQuery2)
 }
 
