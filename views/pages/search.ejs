@@ -1,16 +1,146 @@
 <head>
     <%- include('../partials/head') %>
+    <style>
+      form {
+        margin-top: 20px;
+      }
+    </style>
 </head>
 
 <body>
     <%- include('../partials/navbar') %>
 
     <div class="pageContent">
-      <h2>Search Recipes</h2>
-      <form>
-        
+      <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+          <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Recipes</a>
+          <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Ingredients</a>
+          <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Categories</a>
+        </div>
+      </nav>
 
-      </form>
+      <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+          <form id="recipe-form">
+            <h2>Search Recipes</h2>
+            <div class="form-group">
+                <label for="nameInput">Name</label>
+                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Enter recipe name">
+              </div>
+            <div class="form-group">
+              <label for="categoryInput">Category</label>
+              <input type="tex" class="form-control" id="categoryInput" name="category" placeholder="e.g. Appetizer, Vegetarian, Side, Winter etc">
+            </div>
+            <div class="form-group">
+              <label for="ratingInput">Rating at least</label>
+              <select class="form-control" id="recipeRatingInput">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" id="recipe-submit-btn">Submit</button>
+          </form>
+        </div>
 
+        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+          <form id="ingredient-form">
+            <h2>Search Ingredients</h2>
+            <div class="form-group">
+                <label for="nameInput">Name</label>
+                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Enter ingredient name">
+              </div>
+            <button class="btn btn-primary" id="ingredient-submit-btn">Submit</button>
+          </form>
+        </div>
+
+        <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+          <form id="category-form">
+            <h2>Search Categories</h2>
+            <div class="form-group">
+                <label for="nameInput">Name</label>
+                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Enter category name">
+              </div>
+            <div class="form-group">
+              <label for="categoryInput"># of recipes at least (popularity)</label>
+              <input type="tex" class="form-control" id="categoryInput" name="popularity" placeholder="e.g. 100, 250, 500 etc">
+            </div>
+            <div class="form-group">
+              <label for="ratingInput">Average rating at least</label>
+              <select class="form-control" id="categoryRatingInput">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" id="category-submit-btn">Submit</button>
+          </form>
+        </div>
+
+      </div>
     </div>
+
+    <script>
+      $("#recipe-submit-btn").click(e => {
+        e.preventDefault();
+        let inputData = {}
+        $("#recipe-form").serializeArray().map(function(x){inputData[x.name] = x.value;});
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify(inputData),
+            contentType: 'application/json',
+            url: '/searchRecipe',                      
+            success: function(data) {
+                if (data == "failure") {
+                    alert("Search error, please try again");
+                } else {
+                    window.location.replace("/results")
+                }
+            }
+        });
+      })
+
+      $("#ingredient-submit-btn").click(e => {
+        e.preventDefault();
+        let inputData = {}
+        $("#ingredient-form").serializeArray().map(function(x){inputData[x.name] = x.value;});
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify(inputData),
+            contentType: 'application/json',
+            url: '/searchIngredient',                      
+            success: function(data) {
+                if (data == "failure") {
+                    alert("Search error, please try again");
+                } else {
+                    window.location.replace("/results")
+                }
+            }
+        });
+      })
+
+      $("#category-submit-btn").click(e => {
+        e.preventDefault();
+        let inputData = {}
+        $("#category-form").serializeArray().map(function(x){inputData[x.name] = x.value;});
+        inputData.rating = $("#categoryRatingInput").val();
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify(inputData),
+            contentType: 'application/json',
+            url: '/searchCategory',                      
+            success: function(data) {
+                if (data == "failure") {
+                    alert("Search error, please try again");
+                } else {
+                    window.location.replace("/results")
+                }
+            }
+        });
+      })      
+    </script>
 </body>

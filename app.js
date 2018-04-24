@@ -48,8 +48,13 @@ function init(){
         app.get('/categories/page/:pageNum', (req, res) => categoriesPage(req, res, pool))
         app.get('/categories/:category', (req, res) => categoryPage(req, res, pool))
         app.get('/categories', (req, res) => categoriesPage(req, res, pool))
+        app.get('/results/page/:pageNum', (req, res) => resultsPage(req, res, pool))
+        app.get('/results', (req, res) => resultsPage(req, res, pool))
         app.get('/favorites', (req, res) => favoritesPage(req, res, pool))
 
+        app.post('/searchRecipe', (req, res) => handleRecipeSearch(req, res, pool))
+        app.post('/searchIngredient', (req, res) => handleIngredientSearch(req, res, pool))
+        app.post('/searchCategory', (req, res) => handleCategorySearch(req, res, pool))
         app.post('/addfavorite', (req, res) => addToFavorites(req, res, pool));
         app.post('/removefavorite', (req, res) => removeFromFavorites(req, res, pool));
         app.post('/signup', (req, res) => registerUser(req, res, pool));
@@ -63,6 +68,21 @@ function logout(req, res) {
   req.session.username = undefined;
   req.session.name = undefined;
   res.redirect("/");
+}
+
+function resultsPage(req, res, pool) {
+    let pageNum = req.params.pageNum;
+    let resultsPerPage = 10;
+    if(!pageNum){
+      pageNum = 1;
+    }
+    console.log(req.session.results.length/resultsPerPage + 1)
+    res.render('pages/results', {
+      pageNum: pageNum, 
+      totalPages: req.session.results.length/resultsPerPage + 1,
+      resultsType: req.session.resultsType,
+      results: req.session.results.slice((pageNum - 1) * resultsPerPage, pageNum * resultsPerPage)
+    });
 }
 
 function recipesPage(req, res, pool) {
@@ -138,7 +158,7 @@ function recipePage(req, res, pool) {
             recipe.INGREDIENTS = result2.rows;
 
             connection.execute(
-              `SELECT category FROM categories
+              `SELECT DISTINCT category FROM categories
                WHERE id = :id
                `,
                {id: recipeID},
@@ -270,7 +290,7 @@ function ingredientsPage(req, res, pool) {
     else {
       getConnection(pool, function(connection){
         connection.execute(
-          `SELECT id, name FROM ingredients
+          `SELECT DISTINCT id, name FROM ingredients
            ORDER BY name
            `,
            {},
@@ -319,7 +339,7 @@ function ingredientPage(req, res, pool) {
         }
 
         connection.execute(
-          `SELECT recipe_id, name
+          `SELECT DISTINCT recipe_id, name
            FROM recipes r JOIN recipe_ingredients ri
            ON r.id = ri.recipe_id
            WHERE ri.nutrition_id = ${ingredientID}
@@ -383,7 +403,7 @@ function categoryPage(req, res, pool) {
     var category = req.params.category.replace(/_/g, " ");
     getConnection(pool, function(connection){
       connection.execute(
-        `SELECT id, name, description, rating
+        `SELECT DISTINCT id, name, description, rating
          FROM categories NATURAL JOIN recipes
          WHERE category = :category
          `,
@@ -422,7 +442,7 @@ function favoritesPage(req, res, pool) {
               res.send(err.message);
               return;
             }
-            console.log(result)
+            // console.log(result)
             res.render('pages/favorites', {recipes: result.rows});
         });
       })
@@ -544,6 +564,84 @@ function removeFromFavorites (req, res, pool) {
           res.send("success");
       });
     })
+}
+
+function handleRecipeSearch(req, res, pool) {
+    let name = req.body.name.toUpperCase();
+    getConnection(pool, function(connection){
+      connection.execute(
+        `SELECT id, name FROM ingredients
+         WHERE name LIKE '%${name}%'
+         ORDER BY name
+         `,
+         {},
+         {maxRows: 100},
+        function(err, result) {
+          closeConnection(connection);
+          if (err) {
+            console.error(err.message);
+            res.send(err.message);
+            return;
+          }
+          req.session.resultsType = "ingredients"
+          req.session.results = result.rows;
+          res.send("success")
+      });
+    });
+}
+
+function handleIngredientSearch(req, res, pool) {
+    let name = req.body.name.toUpperCase();
+    getConnection(pool, function(connection){
+      connection.execute(
+        `SELECT DISTINCT id, name FROM ingredients
+         WHERE UPPER(name) LIKE '%${name}%'
+         ORDER BY name
+         `,
+         {},
+         {maxRows: 100},
+        function(err, result) {
+          closeConnection(connection);
+          if (err) {
+            console.error(err.message);
+            res.send(err.message);
+            return;
+          }
+          req.session.resultsType = "ingredients"
+          req.session.results = result.rows;
+          res.send("success")
+      });
+    });
+}
+
+function handleCategorySearch(req, res, pool) {
+    let name = req.body.name.toUpperCase();
+    let popularity = parseInt(req.body.popularity);
+    let rating = parseInt(req.body.rating);
+
+    getConnection(pool, function(connection){
+      connection.execute(
+        `SELECT DISTINCT category 
+         FROM categories NATURAL JOIN recipes
+         WHERE UPPER(category) LIKE '%${name}%'
+         GROUP BY category
+         HAVING COUNT(*) > :popularity AND AVG(rating) > :rating
+         ORDER BY category
+         `,
+         {popularity: popularity, rating: rating},
+         {maxRows: 100, outFormat: oracledb.ARRAY},
+        function(err, result) {
+          closeConnection(connection);
+          if (err) {
+            console.error(err.message);
+            res.send(err.message);
+            return;
+          }
+          req.session.resultsType = "categories"
+          req.session.results = result.rows;
+          res.send("success")
+      });
+    });
 }
 
 //call this function with the function callback(connection), and do whatever with that connection

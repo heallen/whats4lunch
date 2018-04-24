@@ -1,0 +1,71 @@
+<head>
+    <%- include('../partials/head') %>
+</head>
+
+<body>
+    <%- include('../partials/navbar') %>
+
+    <div class="pageContent">
+
+      <div class="recipesContainer">
+        <% if (resultsType == "recipes") { %>
+          <h2>Recipes</h2>
+        <% } else if (resultsType == "ingredients") { %>
+          <h2>Ingredients Search Results</h2>
+        <% } else { %>
+          <h2>Categories Search Results</h2>
+        <% } %>
+
+        <% if (totalPages >= 2) { %>
+          <% if(pageNum == 1) { %>
+            <button style="display: none" id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
+            <button id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
+          <% } else if (pageNum >= totalPages) { %>
+            <button id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
+            <button style="display:none" id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
+          <% } else { %>
+            <button id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
+            <button id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
+          <% } %>
+        <% } %>
+
+        <br><br>
+
+        <% if (resultsType == "recipes") { %>
+          <ul class="recipesList list-group list-group-flush">
+            <% results.forEach(function(recipe) { %>
+              <li class="list-group-item">
+                
+                <div>
+                  <a href=<%= "/recipes/" + recipe.ID %>><%= recipe.NAME %></a>
+                </div>
+
+                <div>
+                  <%= recipe.DESCRIPTION %>
+                </div>
+
+                <div>
+                 Rating: <%= recipe.RATING %>
+                </div>
+
+              </li>
+            <% }) %>
+          </ul>
+        <% } else if (resultsType == "ingredients") { %>
+          <ul class="list-group list-group-flush">
+            <% results.forEach(function(ingredient) { %>
+              <li class="list-group-item"><a href=<%= "/ingredients/"+ingredient.ID %>>%><%= ingredient.NAME %></a></li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <ul class="list-group list-group-flush">
+            <% results.forEach(function(category) { %>
+              <li class="list-group-item"><a href=<%= "/categories/" + category[0].replace(/ /g, "_") %>>%><%= category %></a></li>
+            <% }) %>
+          </ul>
+        <% } %>
+        
+      </div>
+    </div>
+    <script src="/scripts/pagination.js"></script>
+</body>
