@@ -2,6 +2,7 @@ normalize_data.js
 - incomplete units for ingredients
     - only has [cup(s), tsp(s), tbsp(s), lb(s), oz]
     - obvious misses: [liter(s), milliliter(s), gram(s)]
+    - other obvious misses: tsp to tbsp conversions, tbsp to cup, etc.
     - difficult to quantify: [a pinch, a bit, sprig(s), large]
 - suboptimal ingredient matching
     - very non-standard ingredients list in recipes.json
