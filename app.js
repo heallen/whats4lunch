@@ -76,7 +76,6 @@ function resultsPage(req, res, pool) {
     if(!pageNum){
       pageNum = 1;
     }
-    console.log(req.session.results.length/resultsPerPage + 1)
     res.render('pages/results', {
       pageNum: pageNum, 
       totalPages: req.session.results.length/resultsPerPage + 1,
@@ -567,27 +566,69 @@ function removeFromFavorites (req, res, pool) {
 }
 
 function handleRecipeSearch(req, res, pool) {
-    let name = req.body.name.toUpperCase();
-    getConnection(pool, function(connection){
-      connection.execute(
-        `SELECT id, name FROM ingredients
-         WHERE name LIKE '%${name}%'
-         ORDER BY name
-         `,
-         {},
-         {maxRows: 100},
-        function(err, result) {
-          closeConnection(connection);
-          if (err) {
-            console.error(err.message);
-            res.send(err.message);
-            return;
-          }
-          req.session.resultsType = "ingredients"
-          req.session.results = result.rows;
-          res.send("success")
+    let recipe = req.body.name.toUpperCase();
+    let rating = req.body.rating;
+
+    if(req.body.category){
+      let categories = req.body.category.toUpperCase().split(',');
+      for (let i = 0; i < categories.length; ++i) {
+        categories[i] = categories[i].trim();
+      }
+
+      
+      //turn into tuples
+      let cats = '(';
+      for (c of categories) {
+          cats += "'" + c + "'" + ', ';
+      }
+      cats = cats.substring(0, cats.length - 2);
+      cats += ')'
+      getConnection(pool, function(connection){
+        connection.execute(
+          `SELECT DISTINCT R.id, R.name, R.description, R.rating
+           FROM recipes R JOIN categories C ON R.id=C.id
+           WHERE UPPER(name) LIKE UPPER('%${recipe}%')
+                 AND (SELECT COUNT(*) FROM categories WHERE id=R.id AND UPPER(category) IN ${cats}) >= :n
+                 AND rating >= :rating
+          `, 
+           {n: categories.length,
+           rating: rating}, 
+           {maxRows: 100},
+          function(err, result) {
+            closeConnection(connection);
+            if (err) {
+              console.error(err.message);
+              res.send(err.message);
+              return;
+            }
+            req.session.resultsType = "recipes"
+            req.session.results = result.rows;
+            res.send("success")
+        });
       });
-    });
+    } else {
+      getConnection(pool, function(connection){
+        connection.execute(
+          `SELECT DISTINCT id, name, description, rating
+           FROM recipes
+           WHERE UPPER(name) LIKE UPPER('%${recipe}%')
+                 AND rating > :rating
+          `, 
+           {rating: rating}, 
+           {maxRows: 100},
+          function(err, result) {
+            closeConnection(connection);
+            if (err) {
+              console.error(err.message);
+              res.send(err.message);
+              return;
+            }
+            req.session.resultsType = "recipes"
+            req.session.results = result.rows;
+            res.send("success")
+        });
+      });
+    }
 }
 
 function handleIngredientSearch(req, res, pool) {

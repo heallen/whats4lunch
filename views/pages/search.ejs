@@ -29,7 +29,7 @@
               </div>
             <div class="form-group">
               <label for="categoryInput">Category</label>
-              <input type="tex" class="form-control" id="categoryInput" name="category" placeholder="e.g. Appetizer, Vegetarian, Side, Winter etc">
+              <input type="tex" class="form-control" id="categoryInput" name="category" placeholder="Comma separated e.g. Appetizer, Vegetarian, Side, Winter etc">
             </div>
             <div class="form-group">
               <label for="ratingInput">Rating at least</label>
@@ -89,6 +89,9 @@
         e.preventDefault();
         let inputData = {}
         $("#recipe-form").serializeArray().map(function(x){inputData[x.name] = x.value;});
+        inputData.rating = parseInt($("#recipeRatingInput").val());
+        // console.log(inputData)
+        // return;
         $.ajax({
             type: 'POST',
             data: JSON.stringify(inputData),

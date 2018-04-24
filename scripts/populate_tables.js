@@ -472,16 +472,27 @@ function miscQuery(connection){
 }
 
 function miscQuery2(connection){
-    let name = "ALA"
+    let categories = ['CHEDDAR', 'CHEESE', 'VEGETABLE']
+    let recipe = 'Pim'
+    let rating = 3
+    // Goal : "Adult" Pimiento Cheese
+    let cats = '(';
+    for (c of categories) {
+        cats += "'" + c + "'" + ', ';
+    }
+    cats = cats.substring(0, cats.length - 2);
+    cats += ')'
+    console.log(cats)
     connection.execute(
-        `SELECT DISTINCT category 
-         FROM categories NATURAL JOIN recipes
-         WHERE UPPER(category) LIKE '%${name}%'
-         GROUP BY category
-         HAVING COUNT(*) > 10 AND AVG(rating) > 3.9
-         ORDER BY category
-         `,
-        {}, {autoCommit: true, maxRows: 10},
+        `SELECT DISTINCT R.id, R.name, R.description, R.rating
+         FROM recipes R JOIN categories C ON R.id=C.id
+         WHERE UPPER(name) LIKE UPPER('%${recipe}%')
+               AND (SELECT COUNT(*) FROM categories WHERE id=R.id AND UPPER(category) IN ${cats}) >= :n
+               AND rating >= :rating
+        `, 
+        {n: categories.length,
+         rating: rating}, 
+        {autoCommit: true, maxRows: 10},
       function(err, result) {
         if (err) {
           console.error(err.message);

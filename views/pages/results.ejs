@@ -20,7 +20,7 @@
           <% if(pageNum == 1) { %>
             <button style="display: none" id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
             <button id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
-          <% } else if (pageNum >= totalPages) { %>
+          <% } else if (pageNum + 0.9999 >= totalPages) { %>
             <button id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
             <button style="display:none" id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
           <% } else { %>
