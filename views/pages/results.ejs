@@ -9,7 +9,7 @@
 
       <div class="recipesContainer">
         <% if (resultsType == "recipes") { %>
-          <h2>Recipes</h2>
+          <h2>Recipe Search Results</h2>
         <% } else if (resultsType == "ingredients") { %>
           <h2>Ingredients Search Results</h2>
         <% } else { %>
@@ -18,39 +18,38 @@
 
         <% if (totalPages >= 2) { %>
           <% if(pageNum == 1) { %>
-            <button style="display: none" id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
-            <button id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
+            <button id="next-btn" class="btn btn-sm btn-outline-primary">Next Page</button>
           <% } else if (pageNum >= totalPages) { %>
-            <button id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
-            <button style="display:none" id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
+            <button id="prev-btn" class="btn btn-sm btn-outline-primary">Previous Page</button>
           <% } else { %>
-            <button id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
-            <button id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
+            <div class="btn-group" role="group">
+              <button id="prev-btn" class="btn btn-sm btn-outline-primary">Previous Page</button>
+              <button id="next-btn" class="btn btn-sm btn-outline-primary">Next Page</button>
+            </div>
           <% } %>
         <% } %>
 
         <br><br>
 
         <% if (resultsType == "recipes") { %>
-          <ul class="recipesList list-group list-group-flush">
+          <div class="card-columns">
             <% results.forEach(function(recipe) { %>
-              <li class="list-group-item">
-                
-                <div>
-                  <a href=<%= "/recipes/" + recipe.ID %>><%= recipe.NAME %></a>
-                </div>
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title"><a href=<%= "/recipes/" + recipe.ID %>><%= recipe.NAME %></a></h5>
+                  <div class="card-text">
+                    <div>
+                      <%= recipe.DESCRIPTION %>
+                    </div>
 
-                <div>
-                  <%= recipe.DESCRIPTION %>
+                    <div>
+                     <em>Rating:</em> <%= recipe.RATING %>
+                    </div>
+                  </div>
                 </div>
-
-                <div>
-                 Rating: <%= recipe.RATING %>
-                </div>
-
-              </li>
-            <% }) %>
-          </ul>
+              </div>
+            <% }) %>   
+          </div>
         <% } else if (resultsType == "ingredients") { %>
           <ul class="list-group list-group-flush">
             <% results.forEach(function(ingredient) { %>

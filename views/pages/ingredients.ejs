@@ -11,11 +11,12 @@
         <h2>Ingredients</h2>
 
         <% if(pageNum == 1) { %>
-          <button style="display: none" id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
-          <button id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
+          <button id="next-btn" class="btn btn-sm btn-outline-primary">Next Page</button>
         <% } else { %>
-          <button id="prev-btn" class="btn btn-sm btn-secondary">Previous Page</button>
-          <button id="next-btn" class="btn btn-sm btn-secondary">Next Page</button>
+          <div class="btn-group" role="group">
+            <button id="prev-btn" class="btn btn-sm btn-outline-primary">Previous Page</button>
+            <button id="next-btn" class="btn btn-sm btn-outline-primary">Next Page</button>
+          </div>
         <% } %>
 
         <br><br>
