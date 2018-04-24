@@ -472,26 +472,10 @@ function miscQuery(connection){
 }
 
 function miscQuery2(connection){
-    let categories = ['CHEDDAR', 'CHEESE', 'VEGETABLE']
-    let recipe = 'Pim'
-    let rating = 3
-    // Goal : "Adult" Pimiento Cheese
-    let cats = '(';
-    for (c of categories) {
-        cats += "'" + c + "'" + ', ';
-    }
-    cats = cats.substring(0, cats.length - 2);
-    cats += ')'
-    console.log(cats)
     connection.execute(
-        `SELECT DISTINCT R.id, R.name, R.description, R.rating
-         FROM recipes R JOIN categories C ON R.id=C.id
-         WHERE UPPER(name) LIKE UPPER('%${recipe}%')
-               AND (SELECT COUNT(*) FROM categories WHERE id=R.id AND UPPER(category) IN ${cats}) >= :n
-               AND rating >= :rating
+        `DROP TABLE recipe_ingredients
         `, 
-        {n: categories.length,
-         rating: rating}, 
+        {}, 
         {autoCommit: true, maxRows: 10},
       function(err, result) {
         if (err) {
@@ -516,6 +500,6 @@ function runQueries(pool){
     // getConnection(pool, insertRecipeIngredients)
     // getConnection(pool, createFavoritesTable)
     // getConnection(pool, createRecipeNameIndex)
-    getConnection(pool, miscQuery2)
+    // getConnection(pool, miscQuery2)
 }
 
