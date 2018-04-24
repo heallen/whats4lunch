@@ -78,7 +78,7 @@ function resultsPage(req, res, pool) {
     }
     res.render('pages/results', {
       pageNum: pageNum, 
-      totalPages: req.session.results.length/resultsPerPage + 1,
+      totalPages: Math.ceil(req.session.results.length/resultsPerPage),
       resultsType: req.session.resultsType,
       results: req.session.results.slice((pageNum - 1) * resultsPerPage, pageNum * resultsPerPage)
     });
