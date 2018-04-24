@@ -619,6 +619,10 @@ function handleCategorySearch(req, res, pool) {
     let popularity = parseInt(req.body.popularity);
     let rating = parseInt(req.body.rating);
 
+    if(!popularity){
+      popularity = 0;
+    }
+
     getConnection(pool, function(connection){
       connection.execute(
         `SELECT DISTINCT category 
