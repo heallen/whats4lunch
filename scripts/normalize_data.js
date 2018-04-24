@@ -354,6 +354,9 @@ function computeIngredientMasses() {
                     }
                 }
             }
+            if (!found_mass && nutrition_obj["gmwt1"]) {
+                mass = nutrition_obj["gmwt1"];
+            }
             ingredient["mass"] = mass;
         }
         ingredients_table_filled.push(ingredient);
