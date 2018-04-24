@@ -100,7 +100,7 @@ function recipesPage(req, res, pool) {
     else {
       getConnection(pool, function(connection){
         connection.execute(
-          `SELECT id, name, description, rating FROM recipes
+          `SELECT DISTINCT id, name, description, rating FROM recipes
            ORDER BY name
            `,
            {},

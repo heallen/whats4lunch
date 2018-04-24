@@ -19,26 +19,25 @@
         <% } %>
 
         <br><br>
-        
-        <ul class="recipesList list-group list-group-flush">
+        <div class="card-columns">
           <% recipes.forEach(function(recipe) { %>
-            <li class="list-group-item">
-              
-              <div>
-                <a href=<%= "/recipes/" + recipe.ID %>><%= recipe.NAME %></a>
-              </div>
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title"><a href=<%= "/recipes/" + recipe.ID %>><%= recipe.NAME %></a></h5>
+                <div class="card-text">
+                  <div>
+                    <%= recipe.DESCRIPTION %>
+                  </div>
 
-              <div>
-                <%= recipe.DESCRIPTION %>
+                  <div>
+                   <em>Rating:</em> <%= recipe.RATING %>
+                  </div>
+                </div>
               </div>
-
-              <div>
-               Rating: <%= recipe.RATING %>
-              </div>
-
-            </li>
-          <% }) %>
-        </ul>
+            </div>
+          <% }) %>   
+        </div>
+        
       </div>
     </div>
     <script src="/scripts/pagination.js"></script>
